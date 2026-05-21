@@ -13,6 +13,13 @@
           <span class="brand-logo" aria-hidden="true"><span>AI</span></span>
           <strong>外呼加微协同平台</strong>
         </div>
+        <label class="business-switcher">
+          <span>业务方向</span>
+          <select id="businessSelect" aria-label="业务方向">
+            <option>新车加微</option>
+            <option>二手车加微</option>
+          </select>
+        </label>
         <nav class="nav">
           <button class="nav-item active" data-view="dashboard">总览</button>
           <button class="nav-item" data-view="leads">线索任务池</button>
@@ -28,15 +35,6 @@
             <h1 id="pageTitle">总览</h1>
           </div>
           <div class="header-actions">
-            <select id="lineFilter" aria-label="业务线">
-              <option>新车加微</option>
-            </select>
-            <select id="scriptFilter" aria-label="AI话术">
-              <option>全部话术</option>
-              <option>加微引导标准版</option>
-              <option>高价值客户精简版</option>
-              <option>沉默客户唤醒版</option>
-            </select>
             <button class="secondary-button" id="refreshBtn">刷新</button>
           </div>
         </header>
@@ -48,8 +46,8 @@
             <article class="metric-card"><span>有效交互率</span><strong>58.6%</strong><small>有效交互 1,092</small></article>
             <article class="metric-card"><span>高意向率</span><strong>18.4%</strong><small>高意向 342</small></article>
             <article class="metric-card"><span>同意加微率</span><strong>9.8%</strong><small>同意加微 183</small></article>
-            <article class="metric-card"><span>人工接管</span><strong data-count="386">386</strong><small>超时 28</small></article>
-            <article class="metric-card"><span>加微成功</span><strong data-count="142">142</strong><small>成功率 36.8%</small></article>
+            <article class="metric-card"><span>人工接管</span><strong data-count="1742">1,742</strong><small>接通后承接 93.5%</small></article>
+            <article class="metric-card"><span>加微成功</span><strong data-count="528">528</strong><small>成功率 30.3%</small></article>
           </div>
 
           <div class="dashboard-grid">
@@ -67,9 +65,8 @@
                 <button class="text-button" data-jump="leads">进入线索池</button>
               </div>
               <div class="todo-list">
-                <button data-jump="leads"><b>28</b><span>高优先级超时未接管</span></button>
-                <button data-jump="leads"><b>63</b><span>AI已完成待回流</span></button>
-                <button data-jump="people"><b>6</b><span>人员电话待校验</span></button>
+                <button data-jump="leads"><b id="p0TodoCount">0</b><span>P0高优待跟进线索</span></button>
+                <button data-jump="leads"><b id="p1TodoCount">0</b><span>P1择机跟进线索</span></button>
               </div>
             </section>
           </div>

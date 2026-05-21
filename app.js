@@ -10,10 +10,10 @@ const funnel = [
   ["AI外呼完成", 4316, "89.5%"],
   ["AI接通", 1864, "43.2%"],
   ["有效交互", 1092, "58.6%"],
+  ["人工接管", 1742, "93.5%"],
   ["高意向", 342, "18.4%"],
   ["同意加微", 183, "9.8%"],
-  ["人工接管", 386, "8.0%"],
-  ["加微成功", 142, "2.9%"]
+  ["加微成功", 528, "30.3%"]
 ];
 
 const callRules = [
@@ -114,8 +114,8 @@ const leads = [
       type: "置换购车"
     },
     callRecords: [
-      { time: "2026-05-21 10:36", result: "已接通", duration: "84秒", summary: "客户愿意了解购车方案，但要求减少电话打扰。AI识别为高意向，建议人工优先接管。" },
-      { time: "2026-05-20 16:02", result: "未接通", duration: "-", summary: "电话未接通，未产生有效沟通。" }
+      { type: "AI外呼", time: "2026-05-21 10:36", result: "已接通", duration: "84秒", summary: "客户愿意了解购车方案，但要求减少电话打扰。AI识别为高意向，建议人工优先接管。" },
+      { type: "AI外呼", time: "2026-05-20 16:02", result: "未接通", duration: "-", summary: "电话未接通，未产生有效沟通。" }
     ],
     ops: ["命中高意向未加微转人工规则", "等待人工接管"]
   },
@@ -141,7 +141,8 @@ const leads = [
       type: "首次购车"
     },
     callRecords: [
-      { time: "2026-05-21 10:42", result: "已接通", duration: "61秒", summary: "客户有近期看车计划，愿意接收车型资料。AI识别为中意向，建议由原跟进人继续确认。" }
+      { type: "AI外呼", time: "2026-05-21 10:42", result: "已接通", duration: "61秒", summary: "客户有近期看车计划，愿意接收车型资料。AI识别为中意向，建议由原跟进人继续确认。" },
+      { type: "人工外呼", time: "2026-05-21 11:08", result: "已接通", duration: "126秒", summary: "王同学完成电话确认，客户同意添加微信并接收宝马3系报价资料。" }
     ],
     ops: ["分配给王同学", "已发送短信加微"]
   },
@@ -167,9 +168,9 @@ const leads = [
       type: "增购"
     },
     callRecords: [
-      { time: "2026-05-21 10:18", result: "已接通", duration: "73秒", summary: "客户明确同意添加微信，AI完成称呼和手机号确认。建议立即人工外呼并同步RPA加微。" },
-      { time: "2026-05-20 11:25", result: "已接通", duration: "36秒", summary: "客户表示在比较车型，暂未确认预算，愿意后续沟通。" },
-      { time: "2026-05-19 15:10", result: "未接通", duration: "-", summary: "电话未接通，进入后续外呼策略。" }
+      { type: "AI外呼", time: "2026-05-21 10:18", result: "已接通", duration: "73秒", summary: "客户明确同意添加微信，AI完成称呼和手机号确认。建议立即人工外呼并同步RPA加微。" },
+      { type: "AI外呼", time: "2026-05-20 11:25", result: "已接通", duration: "36秒", summary: "客户表示在比较车型，暂未确认预算，愿意后续沟通。" },
+      { type: "AI外呼", time: "2026-05-19 15:10", result: "未接通", duration: "-", summary: "电话未接通，进入后续外呼策略。" }
     ],
     ops: ["命中同意加微优先承接规则", "接管SLA超时"]
   },
@@ -195,7 +196,7 @@ const leads = [
       type: "未知"
     },
     callRecords: [
-      { time: "2026-05-21 11:02", result: "未接通", duration: "-", summary: "AI外呼未接通，暂未生成意向判断。" }
+      { type: "AI外呼", time: "2026-05-21 11:02", result: "未接通", duration: "-", summary: "AI外呼未接通，暂未生成意向判断。" }
     ],
     ops: ["等待外呼平台复呼策略处理"]
   },
@@ -221,8 +222,9 @@ const leads = [
       type: "家庭增购"
     },
     callRecords: [
-      { time: "2026-05-21 11:20", result: "已接通", duration: "52秒", summary: "客户愿意后续沟通，但本次加微链接未完成添加。AI识别为中意向，建议人工复核加微失败原因。" },
-      { time: "2026-05-18 17:14", result: "已接通", duration: "41秒", summary: "客户表示需要与家人商量，暂未决定具体购车时间。" }
+      { type: "AI外呼", time: "2026-05-21 11:20", result: "已接通", duration: "52秒", summary: "客户愿意后续沟通，但本次加微链接未完成添加。AI识别为中意向，建议人工复核加微失败原因。" },
+      { type: "人工外呼", time: "2026-05-21 11:42", result: "已接通", duration: "96秒", summary: "王同学确认客户可后续沟通，加微失败原因是短信链接过期，已重新发送。" },
+      { type: "AI外呼", time: "2026-05-18 17:14", result: "已接通", duration: "41秒", summary: "客户表示需要与家人商量，暂未决定具体购车时间。" }
     ],
     ops: ["短信加微失败", "命中加微失败人工复核规则"]
   }
@@ -304,6 +306,13 @@ function renderFunnel() {
       </div>
     `;
   }).join("");
+}
+
+function renderTodos() {
+  const p0Count = leads.filter((lead) => lead.handoff.includes("P0")).length;
+  const p1Count = leads.filter((lead) => lead.handoff.includes("P1")).length;
+  document.querySelector("#p0TodoCount").textContent = p0Count;
+  document.querySelector("#p1TodoCount").textContent = p1Count;
 }
 
 function ruleCard(rule, mode = "call") {
@@ -484,7 +493,7 @@ function openLeadDetail(index) {
           <div class="call-history">
             ${lead.callRecords.map((record) => `
               <article>
-                <header><b>${record.time}</b><span class="tag ${tagClass(record.result)}">${record.result}</span><span>${record.duration}</span></header>
+                <header><b>${record.time}</b><span class="tag record-type">${record.type}</span><span class="tag ${tagClass(record.result)}">${record.result}</span><span>${record.duration}</span></header>
                 <p>${record.summary}</p>
               </article>
             `).join("")}
@@ -517,6 +526,10 @@ function openLeadDetail(index) {
 }
 
 function bindActions() {
+  document.querySelector("#businessSelect").addEventListener("change", (event) => {
+    document.querySelector(".eyebrow").textContent = event.target.value;
+    toast(`已切换到${event.target.value}`);
+  });
   document.querySelector("#refreshBtn").addEventListener("click", () => {
     document.querySelectorAll("[data-count]").forEach((node) => {
       const value = Number(node.dataset.count) + Math.floor(Math.random() * 16);
@@ -556,6 +569,7 @@ function toast(message) {
 }
 
 renderFunnel();
+renderTodos();
 renderRules();
 renderLeads();
 renderPeople();
