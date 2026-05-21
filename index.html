@@ -3,21 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI外呼加微协同平台</title>
+    <title>外呼加微协同平台</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="app">
       <aside class="sidebar">
         <div class="brand">
-          <span class="brand-logo">AI</span>
-          <strong>加微协同平台</strong>
+          <span class="brand-logo" aria-hidden="true"><span>AI</span></span>
+          <strong>外呼加微协同平台</strong>
         </div>
         <nav class="nav">
-          <button class="nav-item active" data-view="dashboard">工作台</button>
+          <button class="nav-item active" data-view="dashboard">总览</button>
+          <button class="nav-item" data-view="leads">线索任务池</button>
+          <button class="nav-item" data-view="people">人员配置</button>
           <button class="nav-item" data-view="rules">规则配置</button>
-          <button class="nav-item" data-view="leads">线索管理</button>
-          <button class="nav-item" data-view="handoff">转人工队列</button>
         </nav>
       </aside>
 
@@ -25,7 +25,7 @@
         <header class="header">
           <div>
             <p class="eyebrow">新车加微</p>
-            <h1 id="pageTitle">工作台</h1>
+            <h1 id="pageTitle">总览</h1>
           </div>
           <div class="header-actions">
             <select id="lineFilter" aria-label="业务线">
@@ -55,38 +55,24 @@
           <div class="dashboard-grid">
             <section class="panel">
               <div class="panel-head">
-                <h2>AI外呼任务概览</h2>
-                <button class="text-button" data-jump="rules">查看规则</button>
+                <h2>外呼加微漏斗</h2>
+                <button class="text-button" data-jump="leads">查看线索</button>
               </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr><th>任务</th><th>线索范围</th><th>AI话术</th><th>进度</th><th>接通率</th><th>转人工</th><th>状态</th></tr>
-                  </thead>
-                  <tbody id="taskTable"></tbody>
-                </table>
-              </div>
+              <div class="funnel" id="funnelChart"></div>
             </section>
 
             <section class="panel">
               <div class="panel-head">
                 <h2>待处理</h2>
-                <button class="text-button" data-jump="handoff">进入队列</button>
+                <button class="text-button" data-jump="leads">进入线索池</button>
               </div>
               <div class="todo-list">
-                <button data-jump="handoff"><b>28</b><span>高优先级超时未接管</span></button>
+                <button data-jump="leads"><b>28</b><span>高优先级超时未接管</span></button>
                 <button data-jump="leads"><b>63</b><span>AI已完成待回流</span></button>
-                <button data-jump="rules"><b>4</b><span>规则命中量异常波动</span></button>
+                <button data-jump="people"><b>6</b><span>人员电话待校验</span></button>
               </div>
             </section>
           </div>
-
-          <section class="panel">
-            <div class="panel-head">
-              <h2>规则命中表现</h2>
-            </div>
-            <div class="rule-performance" id="performanceGrid"></div>
-          </section>
         </section>
 
         <section class="view" id="rules">
@@ -94,24 +80,43 @@
             <div>
               <h2>规则配置</h2>
             </div>
-            <button class="primary-button" id="openRuleModal">新建规则</button>
+            <button class="primary-button" id="openRuleModal">新建AI外呼规则</button>
           </div>
           <div class="tabs" role="tablist">
             <button class="tab active" data-rule-tab="callRules">AI外呼规则</button>
             <button class="tab" data-rule-tab="handoffRules">转人工规则</button>
             <button class="tab" data-rule-tab="callbackRules">回流CRM规则</button>
           </div>
-          <div class="rule-grid active" id="callRules"></div>
-          <div class="rule-grid" id="handoffRules"></div>
-          <div class="rule-grid" id="callbackRules"></div>
+          <div class="rule-pane active" id="callRules">
+            <div class="rule-pane-head">
+              <h3>AI外呼规则</h3>
+              <span>配置哪些CRM线索进入AI外呼，以及使用哪套AI话术。</span>
+            </div>
+            <div class="rule-grid" id="callRuleGrid"></div>
+          </div>
+          <div class="rule-pane" id="handoffRules">
+            <div class="rule-pane-head">
+              <h3>转人工规则</h3>
+              <span>配置AI外呼结果如何生成承接任务、任务等级和推荐动作。</span>
+            </div>
+            <div class="rule-grid" id="handoffRuleGrid"></div>
+          </div>
+          <div class="rule-pane" id="callbackRules">
+            <div class="rule-pane-head">
+              <h3>回流CRM规则</h3>
+              <span>配置哪些过程状态、人工结果和异常原因需要同步回CRM。</span>
+            </div>
+            <div class="rule-grid" id="callbackRuleGrid"></div>
+          </div>
         </section>
 
         <section class="view" id="leads">
           <div class="section-head">
-            <h2>线索管理</h2>
+            <h2>线索任务池</h2>
             <div class="filter-row">
               <select><option>全部联系状态</option><option>AI待外呼</option><option>已接通</option><option>未接通</option></select>
               <select><option>全部加微状态</option><option>未加微</option><option>同意加微</option><option>加微成功</option><option>加微失败</option></select>
+              <select><option>全部转人工优先级</option><option>AI外呼中-无需接管</option><option>P0高优待跟进</option><option>P1择机跟进</option><option>已跟进</option></select>
               <select><option>全部跟进人</option><option>王同学</option><option>李同学</option><option>待分配</option></select>
             </div>
           </div>
@@ -119,7 +124,7 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr><th>客户ID</th><th>客户</th><th>联系状态</th><th>加微状态</th><th>AI意向</th><th>跟进人</th><th>清洗员</th><th>线索创建</th><th>转人工</th></tr>
+                  <tr><th>客户ID</th><th>客户</th><th>联系状态</th><th>外呼次数</th><th>加微状态</th><th>AI意向</th><th>跟进人</th><th>清洗员</th><th>线索创建</th><th>转人工</th><th>操作</th></tr>
                 </thead>
                 <tbody id="leadTable"></tbody>
               </table>
@@ -127,20 +132,25 @@
           </section>
         </section>
 
-        <section class="view" id="handoff">
+        <section class="view" id="people">
           <div class="section-head">
-            <h2>转人工队列</h2>
+            <h2>人员配置</h2>
             <div class="filter-row">
-              <select><option>全部跟进人</option><option>王同学</option><option>李同学</option><option>待分配</option></select>
-              <select><option>全部清洗员</option><option>张同学</option><option>赵同学</option></select>
-              <select><option>全部任务等级</option><option>P0 高优</option><option>P1 普通</option></select>
-              <input placeholder="客户ID" />
+              <select><option>全部角色</option><option>BPO</option><option>销售</option><option>主管</option></select>
+              <select><option>全部团队</option><option>BPO一组</option><option>BPO二组</option><option>直营顾问组</option></select>
+              <button class="primary-button" id="openPersonModal">新增人员</button>
             </div>
           </div>
-          <div class="handoff-layout">
-            <section class="queue" id="handoffList"></section>
-            <aside class="detail" id="handoffDetail"></aside>
-          </div>
+          <section class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>电话/唯一ID</th><th>姓名</th><th>角色</th><th>团队分组</th><th>性别</th><th>绑定线索</th><th>接管中</th><th>状态</th></tr>
+                </thead>
+                <tbody id="peopleTable"></tbody>
+              </table>
+            </div>
+          </section>
         </section>
       </main>
     </div>
@@ -148,9 +158,55 @@
     <div class="modal" id="ruleModal" aria-hidden="true">
       <div class="modal-panel">
         <div class="modal-head">
-          <h2>新建AI外呼规则</h2>
+          <h2 id="ruleModalTitle">新建AI外呼规则</h2>
           <button class="icon-button close-modal">×</button>
         </div>
+        <div class="form-grid" id="ruleForm"></div>
+        <div class="rule-builder" id="ruleBuilder">
+          <b>规则条件</b>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-button close-modal">取消</button>
+          <button class="primary-button" id="saveRule">保存规则</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="leadModal" aria-hidden="true">
+      <div class="modal-panel lead-modal-panel">
+        <div class="modal-head">
+          <h2 id="leadModalTitle">线索详情</h2>
+          <button class="icon-button close-lead-modal">×</button>
+        </div>
+        <div id="leadDetailContent"></div>
+        <div class="modal-actions">
+          <button class="secondary-button close-lead-modal">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="personModal" aria-hidden="true">
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2>新增人员</h2>
+          <button class="icon-button close-person-modal">×</button>
+        </div>
+        <div class="form-grid">
+          <label>电话/唯一ID<input value="13800008888" /></label>
+          <label>姓名<input value="王同学" /></label>
+          <label>角色<select><option>BPO</option><option>销售</option><option>主管</option></select></label>
+          <label>团队分组<select><option>BPO一组</option><option>BPO二组</option><option>直营顾问组</option></select></label>
+          <label>性别<select><option>女</option><option>男</option></select></label>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-button close-person-modal">取消</button>
+          <button class="primary-button" id="savePerson">保存人员</button>
+        </div>
+      </div>
+    </div>
+
+    <template id="legacyRuleTemplate">
+      <div>
         <div class="form-grid">
           <label>规则名称<input value="BPO未加微未联系自动外呼" /></label>
           <label>适用同学/团队<select><option>BPO一组</option><option>直营顾问组</option><option>BPO二组</option></select></label>
@@ -164,12 +220,8 @@
           <div class="condition-row"><span>加微状态</span><em>未加微 或 加微失败</em></div>
           <div class="condition-row"><span>历史沟通</span><em>近7天无人工跟进</em></div>
         </div>
-        <div class="modal-actions">
-          <button class="secondary-button close-modal">取消</button>
-          <button class="primary-button" id="saveRule">保存规则</button>
-        </div>
       </div>
-    </div>
+    </template>
 
     <script src="app.js"></script>
   </body>

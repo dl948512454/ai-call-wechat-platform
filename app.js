@@ -1,21 +1,19 @@
 const titles = {
-  dashboard: "工作台",
-  rules: "规则配置",
-  leads: "线索管理",
-  handoff: "转人工队列"
+  dashboard: "总览",
+  leads: "线索任务池",
+  people: "人员配置",
+  rules: "规则配置"
 };
 
-const taskRows = [
-  ["BPO一组未加微未联系", "BPO一组 / 已分配未加微未联系", "加微引导标准版", "3,120 / 4,000", "44.8%", "236", "运行中"],
-  ["直营高价值未加微", "直营顾问组 / 高价值未加微", "高价值客户精简版", "740 / 1,200", "51.6%", "88", "运行中"],
-  ["沉默客户唤醒", "BPO二组 / 沉默30天未加微", "沉默客户唤醒版", "456 / 900", "31.2%", "38", "运行中"],
-  ["公海回捞", "公海 / 已分配未联系", "加微引导标准版", "0 / 600", "-", "-", "待启动"]
-];
-
-const performance = [
-  ["BPO一组未加微未联系", "命中 4,000", "接通率 44.8%", "转人工 236"],
-  ["直营高价值未加微", "命中 1,200", "高意向率 24.1%", "转人工 88"],
-  ["沉默客户唤醒", "命中 900", "有效交互率 42.6%", "转人工 38"]
+const funnel = [
+  ["CRM进入AI范围", 4820, "100%"],
+  ["AI外呼完成", 4316, "89.5%"],
+  ["AI接通", 1864, "43.2%"],
+  ["有效交互", 1092, "58.6%"],
+  ["高意向", 342, "18.4%"],
+  ["同意加微", 183, "9.8%"],
+  ["人工接管", 386, "8.0%"],
+  ["加微成功", 142, "2.9%"]
 ];
 
 const callRules = [
@@ -94,90 +92,223 @@ const callbackRules = [
 ];
 
 const leads = [
-  ["CRM102938", "陈先生 138****4218", "已接通", "未加微", "高意向", "待分配", "张同学", "2026-05-21 09:12", "P0待接管"],
-  ["CRM102944", "赵女士 186****0921", "已接通", "同意加微", "中意向", "王同学", "张同学", "2026-05-21 09:26", "P0跟进中"],
-  ["CRM102951", "李女士 159****7742", "已接通", "未加微", "高意向", "待分配", "赵同学", "2026-05-21 10:04", "P0超时"],
-  ["CRM102966", "周先生 136****8120", "未接通", "未加微", "未知", "李同学", "赵同学", "2026-05-21 10:42", "未转人工"],
-  ["CRM102981", "孙女士 188****6609", "已接通", "加微失败", "中意向", "王同学", "张同学", "2026-05-21 11:08", "P1待接管"]
-];
-
-const handoffs = [
   {
-    name: "陈先生",
     id: "CRM102938",
-    phone: "138****4218",
-    task: "BPO一组未加微未联系",
-    level: "高意向",
-    grade: "P0 高优",
+    customer: "陈先生 138****4218",
+    contact: "已接通",
+    callCount: 2,
+    wechat: "未加微",
+    intent: "高意向",
     owner: "待分配",
+    ownerPhone: "-",
     cleaner: "张同学",
-    sla: "剩余06:20",
-    time: "2026-05-21 10:36",
-    summary: "客户愿意添加微信了解购车方案，但强调不希望频繁电话打扰。",
-    action: "建议先短信加微，5分钟后人工电话确认。",
-    records: ["AI外呼已接通，通话时长 84秒", "客户标签：高意向、愿意加微、价格敏感", "历史跟进：近7天无人工跟进"]
+    created: "2026-05-21 09:12",
+    handoff: "P0高优待跟进",
+    task: "BPO一组未加微未联系",
+    script: "加微引导标准版",
+    intentInfo: {
+      model: "凯迪拉克CT5",
+      city: "重庆",
+      budget: "20-25万",
+      cycle: "1个月内",
+      type: "置换购车"
+    },
+    callRecords: [
+      { time: "2026-05-21 10:36", result: "已接通", duration: "84秒", summary: "客户愿意了解购车方案，但要求减少电话打扰。AI识别为高意向，建议人工优先接管。" },
+      { time: "2026-05-20 16:02", result: "未接通", duration: "-", summary: "电话未接通，未产生有效沟通。" }
+    ],
+    ops: ["命中高意向未加微转人工规则", "等待人工接管"]
   },
   {
-    name: "赵女士",
     id: "CRM102944",
-    phone: "186****0921",
-    task: "直营高价值未加微",
-    level: "中意向",
-    grade: "P0 高优",
+    customer: "赵女士 186****0921",
+    contact: "已接通",
+    callCount: 1,
+    wechat: "同意加微",
+    intent: "中意向",
     owner: "王同学",
+    ownerPhone: "13800008888",
     cleaner: "张同学",
-    sla: "剩余11:48",
-    time: "2026-05-21 10:42",
-    summary: "客户近期有看车需求，愿意接收资料，需要人工进一步确认是否加微。",
-    action: "建议发送车型资料短信，并由原跟进人电话确认。",
-    records: ["AI外呼已接通，通话时长 61秒", "客户标签：需要资料、中意向", "历史跟进：3天前有CRM浏览记录"]
+    created: "2026-05-21 09:26",
+    handoff: "已跟进",
+    task: "直营高价值未加微",
+    script: "高价值客户精简版",
+    intentInfo: {
+      model: "宝马3系",
+      city: "成都",
+      budget: "25-30万",
+      cycle: "2周内",
+      type: "首次购车"
+    },
+    callRecords: [
+      { time: "2026-05-21 10:42", result: "已接通", duration: "61秒", summary: "客户有近期看车计划，愿意接收车型资料。AI识别为中意向，建议由原跟进人继续确认。" }
+    ],
+    ops: ["分配给王同学", "已发送短信加微"]
   },
   {
-    name: "李女士",
     id: "CRM102951",
-    phone: "159****7742",
-    task: "BPO一组未加微未联系",
-    level: "高意向",
-    grade: "P0 高优",
+    customer: "李女士 159****7742",
+    contact: "已接通",
+    callCount: 3,
+    wechat: "未加微",
+    intent: "高意向",
     owner: "待分配",
+    ownerPhone: "-",
     cleaner: "赵同学",
-    sla: "超时03:12",
-    time: "2026-05-21 10:18",
-    summary: "客户明确同意添加微信，AI已完成称呼和手机号确认。",
-    action: "建议立即人工外呼，并同步发起RPA加微。",
-    records: ["AI外呼已接通，通话时长 73秒", "客户标签：同意加微、高意向", "历史跟进：无人工接管记录"]
+    created: "2026-05-21 10:04",
+    handoff: "P0高优待跟进",
+    task: "BPO一组未加微未联系",
+    script: "加微引导标准版",
+    intentInfo: {
+      model: "奥迪A4L",
+      city: "杭州",
+      budget: "25万左右",
+      cycle: "本周",
+      type: "增购"
+    },
+    callRecords: [
+      { time: "2026-05-21 10:18", result: "已接通", duration: "73秒", summary: "客户明确同意添加微信，AI完成称呼和手机号确认。建议立即人工外呼并同步RPA加微。" },
+      { time: "2026-05-20 11:25", result: "已接通", duration: "36秒", summary: "客户表示在比较车型，暂未确认预算，愿意后续沟通。" },
+      { time: "2026-05-19 15:10", result: "未接通", duration: "-", summary: "电话未接通，进入后续外呼策略。" }
+    ],
+    ops: ["命中同意加微优先承接规则", "接管SLA超时"]
+  },
+  {
+    id: "CRM102966",
+    customer: "周先生 136****8120",
+    contact: "未接通",
+    callCount: 1,
+    wechat: "未加微",
+    intent: "未知",
+    owner: "李同学",
+    ownerPhone: "13900006666",
+    cleaner: "赵同学",
+    created: "2026-05-21 10:42",
+    handoff: "AI外呼中-无需接管",
+    task: "沉默客户唤醒",
+    script: "沉默客户唤醒版",
+    intentInfo: {
+      model: "未明确",
+      city: "广州",
+      budget: "未明确",
+      cycle: "未明确",
+      type: "未知"
+    },
+    callRecords: [
+      { time: "2026-05-21 11:02", result: "未接通", duration: "-", summary: "AI外呼未接通，暂未生成意向判断。" }
+    ],
+    ops: ["等待外呼平台复呼策略处理"]
+  },
+  {
+    id: "CRM102981",
+    customer: "孙女士 188****6609",
+    contact: "已接通",
+    callCount: 2,
+    wechat: "加微失败",
+    intent: "中意向",
+    owner: "王同学",
+    ownerPhone: "13800008888",
+    cleaner: "张同学",
+    created: "2026-05-21 11:08",
+    handoff: "P1择机跟进",
+    task: "直营高价值未加微",
+    script: "高价值客户精简版",
+    intentInfo: {
+      model: "理想L6",
+      city: "苏州",
+      budget: "30万左右",
+      cycle: "1-3个月",
+      type: "家庭增购"
+    },
+    callRecords: [
+      { time: "2026-05-21 11:20", result: "已接通", duration: "52秒", summary: "客户愿意后续沟通，但本次加微链接未完成添加。AI识别为中意向，建议人工复核加微失败原因。" },
+      { time: "2026-05-18 17:14", result: "已接通", duration: "41秒", summary: "客户表示需要与家人商量，暂未决定具体购车时间。" }
+    ],
+    ops: ["短信加微失败", "命中加微失败人工复核规则"]
   }
 ];
 
+const people = [
+  ["13800008888", "王同学", "BPO", "BPO一组", "女", "126", "18", "启用"],
+  ["13900006666", "李同学", "销售", "直营顾问组", "男", "84", "9", "启用"],
+  ["13700005555", "张同学", "BPO", "BPO一组", "女", "98", "14", "启用"],
+  ["13600004444", "赵同学", "BPO", "BPO二组", "男", "76", "6", "启用"],
+  ["13500003333", "陈主管", "主管", "BPO一组", "男", "0", "0", "启用"]
+];
+
+const ruleForms = {
+  callRules: {
+    title: "新建AI外呼规则",
+    button: "新建AI外呼规则",
+    fields: [
+      ["规则名称", "input", "BPO未加微未联系自动外呼"],
+      ["适用同学/团队", "select", ["BPO一组", "直营顾问组", "BPO二组"]],
+      ["CRM线索条件", "select", ["已分配 + 未加微 + 未联系", "高价值客户 + 未加微", "沉默30天 + 未加微"]],
+      ["AI话术", "select", ["加微引导标准版", "高价值客户精简版", "沉默客户唤醒版"]]
+    ],
+    conditions: [
+      ["线索状态", "已分配 / 未加微 / 未联系"],
+      ["适用范围", "指定团队或同学名下线索"],
+      ["执行动作", "进入AI外呼任务队列"]
+    ]
+  },
+  handoffRules: {
+    title: "新建转人工规则",
+    button: "新建转人工规则",
+    fields: [
+      ["规则名称", "input", "高意向未加微转人工"],
+      ["通话标签", "select", ["高意向 / 愿意加微", "中意向 / 需要资料", "反感 / 风险"]],
+      ["加微状态", "select", ["未加微", "同意加微", "加微失败"]],
+      ["承接团队", "select", ["原跟进人", "BPO主管分配", "直营顾问组"]]
+    ],
+    conditions: [
+      ["历史沟通", "近7天无人工跟进"],
+      ["任务等级", "P0高优 / P1普通"],
+      ["推荐动作", "人工外呼 / 短信加微 / RPA加微"]
+    ]
+  },
+  callbackRules: {
+    title: "新建回流CRM规则",
+    button: "新建回流CRM规则",
+    fields: [
+      ["规则名称", "input", "AI外呼完成状态回流"],
+      ["回流节点", "select", ["AI外呼完成", "转人工生成", "人工反馈完成", "回流失败补偿"]],
+      ["回流字段", "select", ["外呼状态 + 意向等级 + 摘要", "转人工状态 + 任务等级", "加微结果 + 失败原因"]],
+      ["回流方式", "select", ["实时回流", "批量补偿", "失败重试"]]
+    ],
+    conditions: [
+      ["幂等键", "客户ID + 状态类型 + 任务ID"],
+      ["失败处理", "记录错误原因并进入补偿队列"],
+      ["CRM状态", "按字段映射更新客户跟进记录"]
+    ]
+  }
+};
+
+let activeRuleTab = "callRules";
+
 function tagClass(value) {
-  if (value.includes("运行") || value.includes("高意向") || value.includes("成功") || value.includes("已接通")) return "green";
-  if (value.includes("待") || value.includes("中意向") || value.includes("同意")) return "orange";
+  if (value.includes("运行") || value.includes("高意向") || value.includes("成功") || value.includes("已接通") || value.includes("已跟进") || value.includes("无需接管")) return "green";
+  if (value.includes("待") || value.includes("择机") || value.includes("中意向") || value.includes("同意")) return "orange";
   if (value.includes("超时") || value.includes("失败")) return "red";
   return "";
 }
 
-function renderTasks() {
-  document.querySelector("#taskTable").innerHTML = taskRows.map((row) => {
-    return `<tr>${row.map((cell, index) => {
-      if (index === 6) return `<td><span class="tag ${tagClass(cell)}">${cell}</span></td>`;
-      return `<td>${cell}</td>`;
-    }).join("")}</tr>`;
+function renderFunnel() {
+  const max = funnel[0][1];
+  document.querySelector("#funnelChart").innerHTML = funnel.map(([name, value, rate]) => {
+    const width = Math.max((value / max) * 100, 18);
+    return `
+      <div class="funnel-row">
+        <div class="funnel-label"><b>${name}</b><span>${value.toLocaleString("zh-CN")} · ${rate}</span></div>
+        <div class="funnel-track"><i style="width:${width}%"></i></div>
+      </div>
+    `;
   }).join("");
-}
-
-function renderPerformance() {
-  document.querySelector("#performanceGrid").innerHTML = performance.map((item) => `
-    <article>
-      <b>${item[0]}</b>
-      <span>${item[1]}</span>
-      <span>${item[2]}</span>
-      <em>${item[3]}</em>
-    </article>
-  `).join("");
 }
 
 function ruleCard(rule, mode = "call") {
   const resultLabel = mode === "call" ? `转人工：${rule.handoff}` : `执行结果：${rule.result}`;
+  const typeLabel = mode === "call" ? "AI外呼" : mode === "handoff" ? "转人工" : "回流CRM";
   return `
     <article class="rule-card">
       <header>
@@ -187,6 +318,7 @@ function ruleCard(rule, mode = "call") {
         </div>
         <button class="switch ${rule.enabled ? "on" : ""}" title="${rule.enabled ? "已启用" : "已停用"}"></button>
       </header>
+      <span class="tag">${typeLabel}</span>
       <div class="rule-meta">
         <span>条件：${rule.condition}</span>
         ${rule.script ? `<span>AI话术：${rule.script}</span>` : ""}
@@ -198,9 +330,9 @@ function ruleCard(rule, mode = "call") {
 }
 
 function renderRules() {
-  document.querySelector("#callRules").innerHTML = callRules.map((rule) => ruleCard(rule, "call")).join("");
-  document.querySelector("#handoffRules").innerHTML = handoffRules.map((rule) => ruleCard(rule, "handoff")).join("");
-  document.querySelector("#callbackRules").innerHTML = callbackRules.map((rule) => ruleCard(rule, "callback")).join("");
+  document.querySelector("#callRuleGrid").innerHTML = callRules.map((rule) => ruleCard(rule, "call")).join("");
+  document.querySelector("#handoffRuleGrid").innerHTML = handoffRules.map((rule) => ruleCard(rule, "handoff")).join("");
+  document.querySelector("#callbackRuleGrid").innerHTML = callbackRules.map((rule) => ruleCard(rule, "callback")).join("");
   document.querySelectorAll(".switch").forEach((button) => {
     button.addEventListener("click", () => {
       button.classList.toggle("on");
@@ -210,65 +342,39 @@ function renderRules() {
 }
 
 function renderLeads() {
-  document.querySelector("#leadTable").innerHTML = leads.map((row) => `
-    <tr>${row.map((cell, index) => {
-      if ([2, 3, 4, 8].includes(index)) return `<td><span class="tag ${tagClass(cell)}">${cell}</span></td>`;
-      return `<td>${cell}</td>`;
-    }).join("")}</tr>
+  document.querySelector("#leadTable").innerHTML = leads.map((lead, index) => `
+    <tr>
+      <td>${lead.id}</td>
+      <td>${lead.customer}</td>
+      <td><span class="tag ${tagClass(lead.contact)}">${lead.contact}</span></td>
+      <td>${lead.callCount}</td>
+      <td><span class="tag ${tagClass(lead.wechat)}">${lead.wechat}</span></td>
+      <td><span class="tag ${tagClass(lead.intent)}">${lead.intent}</span></td>
+      <td>${lead.owner}</td>
+      <td>${lead.cleaner}</td>
+      <td>${lead.created}</td>
+      <td><span class="tag ${tagClass(lead.handoff)}">${lead.handoff}</span></td>
+      <td><button class="text-button lead-detail-button" data-index="${index}">详情</button></td>
+    </tr>
   `).join("");
-}
-
-function renderHandoffs(activeIndex = 0) {
-  const list = document.querySelector("#handoffList");
-  list.innerHTML = handoffs.map((item, index) => `
-    <button class="queue-card ${index === activeIndex ? "active" : ""}" data-index="${index}">
-      <header><b>${item.name}</b><span class="tag ${tagClass(item.sla)}">${item.sla}</span></header>
-      <p>${item.id} · ${item.phone}</p>
-      <p>${item.task}</p>
-      <div><span class="tag ${tagClass(item.level)}">${item.level}</span><span class="tag ${tagClass(item.grade)}">${item.grade}</span></div>
-    </button>
-  `).join("");
-  list.querySelectorAll(".queue-card").forEach((button) => {
-    button.addEventListener("click", () => renderHandoffs(Number(button.dataset.index)));
+  document.querySelectorAll(".lead-detail-button").forEach((button) => {
+    button.addEventListener("click", () => openLeadDetail(Number(button.dataset.index)));
   });
-  renderDetail(activeIndex);
 }
 
-function renderDetail(index) {
-  const item = handoffs[index];
-  document.querySelector("#handoffDetail").innerHTML = `
-    <div class="detail-head">
-      <div>
-        <h2>${item.name}</h2>
-        <p>${item.id} · ${item.phone}</p>
-      </div>
-      <span class="tag ${tagClass(item.grade)}">${item.grade}</span>
-    </div>
-    <div class="info-grid">
-      <span><b>来源任务</b>${item.task}</span>
-      <span><b>跟进人</b>${item.owner}</span>
-      <span><b>清洗员</b>${item.cleaner}</span>
-      <span><b>任务时间</b>${item.time}</span>
-    </div>
-    <section class="detail-section">
-      <h2>AI摘要</h2>
-      <p>${item.summary}</p>
-    </section>
-    <section class="detail-section">
-      <h2>推荐动作</h2>
-      <p>${item.action}</p>
-      <div class="detail-actions">
-        <button class="primary-button">人工外呼</button>
-        <button class="secondary-button">短信加微</button>
-        <button class="secondary-button">RPA加微</button>
-        <button class="secondary-button">反馈结果</button>
-      </div>
-    </section>
-    <section class="detail-section">
-      <h2>通话与跟进记录</h2>
-      <div class="timeline">${item.records.map((record) => `<div>${record}</div>`).join("")}</div>
-    </section>
-  `;
+function renderPeople() {
+  document.querySelector("#peopleTable").innerHTML = people.map((row) => `
+    <tr>
+      <td><b>${row[0]}</b></td>
+      <td>${row[1]}</td>
+      <td><span class="tag">${row[2]}</span></td>
+      <td>${row[3]}</td>
+      <td>${row[4]}</td>
+      <td>${row[5]}</td>
+      <td>${row[6]}</td>
+      <td><span class="tag green">${row[7]}</span></td>
+    </tr>
+  `).join("");
 }
 
 function switchView(viewName) {
@@ -290,9 +396,11 @@ function bindRuleTabs() {
   document.querySelectorAll(".tab").forEach((button) => {
     button.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
-      document.querySelectorAll(".rule-grid").forEach((grid) => grid.classList.remove("active"));
+      document.querySelectorAll(".rule-pane").forEach((pane) => pane.classList.remove("active"));
       button.classList.add("active");
       document.querySelector(`#${button.dataset.ruleTab}`).classList.add("active");
+      activeRuleTab = button.dataset.ruleTab;
+      document.querySelector("#openRuleModal").textContent = ruleForms[activeRuleTab].button;
     });
   });
 }
@@ -304,6 +412,7 @@ function bindModal() {
     modal.setAttribute("aria-hidden", "true");
   };
   document.querySelector("#openRuleModal").addEventListener("click", () => {
+    renderRuleForm(activeRuleTab);
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
   });
@@ -317,6 +426,96 @@ function bindModal() {
   });
 }
 
+function renderRuleForm(tabName) {
+  const config = ruleForms[tabName];
+  document.querySelector("#ruleModalTitle").textContent = config.title;
+  document.querySelector("#ruleForm").innerHTML = config.fields.map(([label, type, value]) => {
+    if (type === "select") {
+      return `<label>${label}<select>${value.map((option) => `<option>${option}</option>`).join("")}</select></label>`;
+    }
+    return `<label>${label}<input value="${value}" /></label>`;
+  }).join("");
+  document.querySelector("#ruleBuilder").innerHTML = `
+    <b>规则条件</b>
+    ${config.conditions.map(([name, value]) => `<div class="condition-row"><span>${name}</span><em>${value}</em></div>`).join("")}
+  `;
+}
+
+function bindLeadModal() {
+  const modal = document.querySelector("#leadModal");
+  const close = () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  };
+  document.querySelectorAll(".close-lead-modal").forEach((button) => button.addEventListener("click", close));
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+}
+
+function openLeadDetail(index) {
+  const lead = leads[index];
+  document.querySelector("#leadModalTitle").textContent = `${lead.id} 线索详情`;
+  document.querySelector("#leadDetailContent").innerHTML = `
+    <div class="lead-detail-layout">
+      <section class="lead-detail-main">
+        <div class="info-grid">
+          <span><b>客户</b>${lead.customer}</span>
+          <span><b>来源任务</b>${lead.task}</span>
+          <span><b>AI话术</b>${lead.script}</span>
+          <span><b>外呼次数</b>${lead.callCount}</span>
+          <span><b>联系状态</b>${lead.contact}</span>
+          <span><b>加微状态</b>${lead.wechat}</span>
+          <span><b>跟进人</b>${lead.owner} ${lead.ownerPhone}</span>
+          <span><b>清洗员</b>${lead.cleaner}</span>
+        </div>
+        <section class="detail-section">
+          <h2>买车意图</h2>
+          <div class="intent-grid">
+            <span><b>意向车型</b>${lead.intentInfo.model}</span>
+            <span><b>购车城市</b>${lead.intentInfo.city}</span>
+            <span><b>购车预算</b>${lead.intentInfo.budget}</span>
+            <span><b>购车周期</b>${lead.intentInfo.cycle}</span>
+            <span><b>购车类型</b>${lead.intentInfo.type}</span>
+          </div>
+        </section>
+        <section class="detail-section">
+          <h2>历史外呼与跟进记录</h2>
+          <div class="call-history">
+            ${lead.callRecords.map((record) => `
+              <article>
+                <header><b>${record.time}</b><span class="tag ${tagClass(record.result)}">${record.result}</span><span>${record.duration}</span></header>
+                <p>${record.summary}</p>
+              </article>
+            `).join("")}
+            ${lead.ops.map((record) => `<article class="op-record"><p>${record}</p></article>`).join("")}
+          </div>
+        </section>
+      </section>
+      <aside class="handoff-panel">
+        <div>
+          <h2>人工接管</h2>
+          <p>${lead.handoff}</p>
+        </div>
+        <div class="handoff-status">
+          <span><b>承接人</b>${lead.owner} ${lead.ownerPhone}</span>
+          <span><b>任务等级</b>${lead.handoff.includes("P0") ? "P0 高优" : lead.handoff.includes("P1") ? "P1 普通" : "未生成"}</span>
+          <span><b>推荐动作</b>${lead.intent === "高意向" ? "优先人工外呼 + RPA加微" : "短信加微后电话确认"}</span>
+        </div>
+        <div class="handoff-actions">
+          <button class="secondary-button">发起外呼</button>
+          <button class="secondary-button">短信加微</button>
+          <button class="secondary-button">RPA加微</button>
+          <button class="secondary-button">跟进反馈</button>
+        </div>
+      </aside>
+    </div>
+  `;
+  const modal = document.querySelector("#leadModal");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
 function bindActions() {
   document.querySelector("#refreshBtn").addEventListener("click", () => {
     document.querySelectorAll("[data-count]").forEach((node) => {
@@ -328,6 +527,26 @@ function bindActions() {
   });
 }
 
+function bindPersonModal() {
+  const modal = document.querySelector("#personModal");
+  const close = () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  };
+  document.querySelector("#openPersonModal").addEventListener("click", () => {
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+  });
+  document.querySelectorAll(".close-person-modal").forEach((button) => button.addEventListener("click", close));
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+  document.querySelector("#savePerson").addEventListener("click", () => {
+    close();
+    toast("人员已保存，电话将作为唯一ID");
+  });
+}
+
 function toast(message) {
   const el = document.createElement("div");
   el.className = "toast";
@@ -336,12 +555,13 @@ function toast(message) {
   window.setTimeout(() => el.remove(), 2200);
 }
 
-renderTasks();
-renderPerformance();
+renderFunnel();
 renderRules();
 renderLeads();
-renderHandoffs();
+renderPeople();
 bindNavigation();
 bindRuleTabs();
 bindModal();
+bindLeadModal();
+bindPersonModal();
 bindActions();

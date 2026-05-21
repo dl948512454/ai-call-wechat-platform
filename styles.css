@@ -1,16 +1,17 @@
 :root {
-  --bg: #f5f7fb;
+  --bg: #f4faf6;
   --surface: #ffffff;
-  --surface-soft: #f8fafc;
-  --text: #172033;
-  --muted: #667085;
-  --line: #e3e8ef;
-  --brand: #2563eb;
-  --brand-soft: #eff6ff;
-  --green: #12805c;
-  --orange: #b85c00;
+  --surface-soft: #f7fbf8;
+  --text: #12261c;
+  --muted: #66766d;
+  --line: #dce9e0;
+  --brand: #168a55;
+  --brand-dark: #0f6d43;
+  --brand-soft: #eaf7ef;
+  --green: #168a55;
+  --orange: #b7791f;
   --red: #c0362c;
-  --shadow: 0 18px 44px rgba(17, 24, 39, 0.08);
+  --shadow: 0 18px 44px rgba(18, 38, 28, 0.08);
 }
 
 * {
@@ -22,7 +23,7 @@ body {
   min-width: 320px;
   color: var(--text);
   background:
-    radial-gradient(circle at 20% -10%, rgba(37, 99, 235, 0.14), transparent 34%),
+    radial-gradient(circle at 20% -10%, rgba(22, 138, 85, 0.16), transparent 34%),
     linear-gradient(180deg, #fbfdff 0%, var(--bg) 44%);
   font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
   letter-spacing: 0;
@@ -40,7 +41,7 @@ button {
 
 .app {
   display: grid;
-  grid-template-columns: 216px minmax(0, 1fr);
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -49,7 +50,7 @@ button {
   top: 0;
   height: 100vh;
   padding: 24px 14px;
-  background: #111827;
+  background: #0f2a1d;
   color: #fff;
 }
 
@@ -62,17 +63,58 @@ button {
 }
 
 .brand-logo {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #4f8df8, #28c4b8);
-  font-weight: 800;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  overflow: hidden;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(255, 255, 255, 0.55), transparent 18%),
+    linear-gradient(135deg, #34d399 0%, #10b981 46%, #0f766e 100%);
+  box-shadow: 0 14px 30px rgba(16, 185, 129, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.brand-logo::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 9px;
+  width: 17px;
+  height: 17px;
+  border: 3px solid rgba(255, 255, 255, 0.94);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  transform: rotate(22deg);
+}
+
+.brand-logo::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  top: 26px;
+  width: 12px;
+  height: 3px;
+  border-radius: 999px;
+  background: #fff;
+  transform: rotate(42deg);
+  box-shadow: 0 6px 0 rgba(255, 255, 255, 0.34);
+}
+
+.brand-logo span {
+  position: absolute;
+  right: 6px;
+  bottom: 5px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .brand strong {
-  font-size: 16px;
+  font-size: 15px;
+  line-height: 1.25;
 }
 
 .nav {
@@ -93,7 +135,7 @@ button {
 
 .nav-item:hover,
 .nav-item.active {
-  background: #263244;
+  background: #1d4632;
   color: #fff;
 }
 
@@ -189,6 +231,10 @@ input {
   color: #fff;
 }
 
+.primary-button:hover {
+  background: var(--brand-dark);
+}
+
 .secondary-button {
   padding: 0 16px;
   background: #fff;
@@ -226,7 +272,6 @@ input {
 .metric-card,
 .panel,
 .rule-card,
-.queue-card,
 .detail,
 .modal-panel {
   border: 1px solid var(--line);
@@ -306,7 +351,7 @@ tr:last-child td {
   padding: 0 9px;
   margin-right: 6px;
   border-radius: 999px;
-  background: #eef4ff;
+  background: #eaf7ef;
   color: var(--brand);
   font-size: 12px;
   font-weight: 700;
@@ -355,35 +400,43 @@ tr:last-child td {
   color: var(--muted);
 }
 
-.rule-performance {
+.funnel {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 13px;
 }
 
-.rule-performance article {
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface-soft);
+.funnel-row {
+  display: grid;
+  grid-template-columns: 168px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
 }
 
-.rule-performance b,
-.rule-performance span,
-.rule-performance em {
+.funnel-label b,
+.funnel-label span {
   display: block;
 }
 
-.rule-performance span {
-  margin-top: 8px;
+.funnel-label span {
+  margin-top: 4px;
   color: var(--muted);
+  font-size: 13px;
 }
 
-.rule-performance em {
-  margin-top: 10px;
-  color: var(--brand);
-  font-style: normal;
-  font-weight: 800;
+.funnel-track {
+  height: 30px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #e7f1eb;
+  overflow: hidden;
+}
+
+.funnel-track i {
+  display: block;
+  height: 100%;
+  min-width: 32px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #16a34a, #14b8a6);
 }
 
 .section-head {
@@ -398,7 +451,7 @@ tr:last-child td {
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #eef2f7;
+  background: #edf7f0;
 }
 
 .tab {
@@ -416,14 +469,37 @@ tr:last-child td {
   box-shadow: 0 1px 4px rgba(17, 24, 39, 0.12);
 }
 
-.rule-grid {
+.rule-pane {
   display: none;
-  grid-template-columns: repeat(2, minmax(280px, 1fr));
-  gap: 14px;
 }
 
-.rule-grid.active {
+.rule-pane.active {
+  display: block;
+}
+
+.rule-pane-head {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.rule-pane-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.rule-pane-head span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.rule-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 14px;
 }
 
 .rule-card {
@@ -431,7 +507,6 @@ tr:last-child td {
 }
 
 .rule-card header,
-.queue-card header,
 .detail-head {
   display: flex;
   align-items: flex-start;
@@ -480,31 +555,6 @@ tr:last-child td {
 
 .switch.on::after {
   transform: translateX(18px);
-}
-
-.handoff-layout {
-  display: grid;
-  grid-template-columns: 390px minmax(0, 1fr);
-  gap: 14px;
-}
-
-.queue-card {
-  padding: 15px;
-  text-align: left;
-}
-
-.queue-card.active {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-}
-
-.queue-card p {
-  margin: 8px 0 0;
-  color: var(--muted);
-}
-
-.queue-card div {
-  margin-top: 12px;
 }
 
 .detail {
@@ -584,6 +634,99 @@ tr:last-child td {
   padding: 20px;
 }
 
+.lead-modal-panel {
+  width: min(1180px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+}
+
+.lead-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 16px;
+}
+
+.lead-detail-main,
+.handoff-panel {
+  min-width: 0;
+}
+
+.intent-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.intent-grid span,
+.handoff-status span {
+  display: block;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.intent-grid b,
+.handoff-status b {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text);
+}
+
+.call-history {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.call-history article {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.call-history header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.call-history p {
+  margin: 8px 0 0;
+}
+
+.op-record {
+  background: var(--surface-soft) !important;
+}
+
+.handoff-panel {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #f2fbf5);
+}
+
+.handoff-panel p {
+  margin: 8px 0 0;
+}
+
+.handoff-status {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.handoff-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -643,7 +786,7 @@ label {
   z-index: 40;
   padding: 12px 16px;
   border-radius: 12px;
-  background: #111827;
+  background: #0f2a1d;
   color: #fff;
   box-shadow: 0 18px 45px rgba(17, 24, 39, 0.22);
 }
@@ -654,11 +797,12 @@ label {
   }
 
   .dashboard-grid,
-  .handoff-layout {
+  .lead-detail-layout {
     grid-template-columns: 1fr;
   }
 
-  .info-grid {
+  .info-grid,
+  .intent-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -696,10 +840,11 @@ label {
   }
 
   .metric-grid,
-  .rule-performance,
-  .rule-grid.active,
+  .rule-grid,
+  .funnel-row,
   .form-grid,
   .info-grid,
+  .intent-grid,
   .detail-actions {
     grid-template-columns: 1fr;
   }
