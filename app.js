@@ -6,13 +6,13 @@ const titles = {
 };
 
 const funnel = [
-  ["CRM进入AI范围", 4820, "100%"],
+  ["未加微线索", 4820, "100%"],
   ["AI外呼完成", 4316, "89.5%"],
   ["AI接通", 1864, "43.2%"],
   ["有效交互", 1092, "58.6%"],
-  ["人工接管", 1742, "93.5%"],
   ["高意向", 342, "18.4%"],
   ["同意加微", 183, "9.8%"],
+  ["人工接管", 1742, "93.5%"],
   ["加微成功", 528, "30.3%"]
 ];
 
@@ -21,6 +21,8 @@ const callRules = [
     name: "BPO一组未加微未联系",
     owner: "BPO一组 24人",
     condition: "CRM已分配 + 未加微 + 未联系",
+    trigger: "自动触发",
+    schedule: "-",
     script: "加微引导标准版",
     handoff: "高意向或同意加微，P0转人工",
     enabled: true
@@ -29,6 +31,8 @@ const callRules = [
     name: "直营高价值未加微",
     owner: "直营顾问组 12人",
     condition: "高价值客户 + 未加微 + 无风险标签",
+    trigger: "自动触发",
+    schedule: "-",
     script: "高价值客户精简版",
     handoff: "接通且中高意向，P0转人工",
     enabled: true
@@ -37,6 +41,8 @@ const callRules = [
     name: "沉默客户唤醒",
     owner: "BPO二组 18人",
     condition: "沉默30天 + 未加微",
+    trigger: "定时触发",
+    schedule: "每天10:00触发",
     script: "沉默客户唤醒版",
     handoff: "同意加微或需要资料，P1转人工",
     enabled: false
@@ -246,11 +252,14 @@ const ruleForms = {
       ["规则名称", "input", "BPO未加微未联系自动外呼"],
       ["适用同学/团队", "select", ["BPO一组", "直营顾问组", "BPO二组"]],
       ["CRM线索条件", "select", ["已分配 + 未加微 + 未联系", "高价值客户 + 未加微", "沉默30天 + 未加微"]],
+      ["触发方式", "select", ["自动触发", "定时触发"]],
+      ["定时触发规则", "select", ["每天09:30触发", "每天10:00触发", "每2小时触发", "每周一09:00触发"]],
       ["AI话术", "select", ["加微引导标准版", "高价值客户精简版", "沉默客户唤醒版"]]
     ],
     conditions: [
       ["线索状态", "已分配 / 未加微 / 未联系"],
       ["适用范围", "指定团队或同学名下线索"],
+      ["触发方式", "自动触发或按定时规则触发"],
       ["执行动作", "进入AI外呼任务队列"]
     ]
   },
@@ -318,6 +327,9 @@ function renderTodos() {
 function ruleCard(rule, mode = "call") {
   const resultLabel = mode === "call" ? `转人工：${rule.handoff}` : `执行结果：${rule.result}`;
   const typeLabel = mode === "call" ? "AI外呼" : mode === "handoff" ? "转人工" : "回流CRM";
+  const ruleList = mode === "call" ? callRules : mode === "handoff" ? handoffRules : callbackRules;
+  const tabName = mode === "call" ? "callRules" : mode === "handoff" ? "handoffRules" : "callbackRules";
+  const ruleIndex = ruleList.indexOf(rule);
   return `
     <article class="rule-card">
       <header>
@@ -330,10 +342,11 @@ function ruleCard(rule, mode = "call") {
       <span class="tag">${typeLabel}</span>
       <div class="rule-meta">
         <span>条件：${rule.condition}</span>
+        ${rule.trigger ? `<span>触发方式：${rule.trigger}${rule.schedule && rule.schedule !== "-" ? ` / ${rule.schedule}` : ""}</span>` : ""}
         ${rule.script ? `<span>AI话术：${rule.script}</span>` : ""}
         <span>${resultLabel}</span>
       </div>
-      <button class="secondary-button">编辑规则</button>
+      <button class="secondary-button edit-rule-button" data-tab="${tabName}" data-index="${ruleIndex}">编辑规则</button>
     </article>
   `;
 }
@@ -347,6 +360,9 @@ function renderRules() {
       button.classList.toggle("on");
       toast(button.classList.contains("on") ? "规则已启用" : "规则已停用");
     });
+  });
+  document.querySelectorAll(".edit-rule-button").forEach((button) => {
+    button.addEventListener("click", () => openRuleModal(button.dataset.tab, Number(button.dataset.index)));
   });
 }
 
@@ -421,9 +437,7 @@ function bindModal() {
     modal.setAttribute("aria-hidden", "true");
   };
   document.querySelector("#openRuleModal").addEventListener("click", () => {
-    renderRuleForm(activeRuleTab);
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
+    openRuleModal(activeRuleTab);
   });
   document.querySelectorAll(".close-modal").forEach((button) => button.addEventListener("click", close));
   modal.addEventListener("click", (event) => {
@@ -435,19 +449,43 @@ function bindModal() {
   });
 }
 
-function renderRuleForm(tabName) {
+function openRuleModal(tabName, ruleIndex = null) {
+  const modal = document.querySelector("#ruleModal");
+  renderRuleForm(tabName, ruleIndex);
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function renderRuleForm(tabName, ruleIndex = null) {
   const config = ruleForms[tabName];
-  document.querySelector("#ruleModalTitle").textContent = config.title;
+  const source = tabName === "callRules" ? callRules : tabName === "handoffRules" ? handoffRules : callbackRules;
+  const rule = Number.isInteger(ruleIndex) ? source[ruleIndex] : null;
+  document.querySelector("#ruleModalTitle").textContent = rule ? config.title.replace("新建", "编辑") : config.title;
   document.querySelector("#ruleForm").innerHTML = config.fields.map(([label, type, value]) => {
+    const preset = rule ? ruleFormValue(tabName, label, rule) : "";
     if (type === "select") {
-      return `<label>${label}<select>${value.map((option) => `<option>${option}</option>`).join("")}</select></label>`;
+      return `<label>${label}<select>${value.map((option) => `<option${option === preset ? " selected" : ""}>${option}</option>`).join("")}</select></label>`;
     }
-    return `<label>${label}<input value="${value}" /></label>`;
+    return `<label>${label}<input value="${preset || value}" /></label>`;
   }).join("");
   document.querySelector("#ruleBuilder").innerHTML = `
     <b>规则条件</b>
     ${config.conditions.map(([name, value]) => `<div class="condition-row"><span>${name}</span><em>${value}</em></div>`).join("")}
   `;
+}
+
+function ruleFormValue(tabName, label, rule) {
+  if (label === "规则名称") return rule.name;
+  if (label === "适用同学/团队") return rule.owner.replace(/\s+\d+人$/, "");
+  if (label === "CRM线索条件" || label === "通话标签" || label === "回流节点") return rule.condition;
+  if (label === "触发方式") return rule.trigger;
+  if (label === "定时触发规则") return rule.schedule && rule.schedule !== "-" ? rule.schedule : "每天09:30触发";
+  if (label === "AI话术") return rule.script;
+  if (label === "加微状态") return "未加微";
+  if (label === "承接团队") return rule.owner;
+  if (label === "回流字段") return rule.result || "";
+  if (label === "回流方式") return rule.result || "";
+  return "";
 }
 
 function bindLeadModal() {
