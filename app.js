@@ -119,6 +119,15 @@ const leads = [
       cycle: "1个月内",
       type: "置换购车"
     },
+    labels: {
+      objection: "客户反感：轻微",
+      bought: "已买车：否",
+      issue: "AI通话问题：无",
+      assistant: "语音助理：否",
+      wechatWay: "加微方式：RPA加微",
+      lastNode: "最后节点：询问预算",
+      effective: "有效交互：是"
+    },
     callRecords: [
       { type: "AI外呼", time: "2026-05-21 10:36", result: "已接通", duration: "84秒", summary: "客户愿意了解购车方案，但要求减少电话打扰。AI识别为高意向，建议人工优先接管。" },
       { type: "AI外呼", time: "2026-05-20 16:02", result: "未接通", duration: "-", summary: "电话未接通，未产生有效沟通。" }
@@ -146,6 +155,15 @@ const leads = [
       cycle: "2周内",
       type: "首次购车"
     },
+    labels: {
+      objection: "客户反感：无",
+      bought: "已买车：否",
+      issue: "AI通话问题：无",
+      assistant: "语音助理：否",
+      wechatWay: "加微方式：短信加微",
+      lastNode: "最后节点：发送资料",
+      effective: "有效交互：是"
+    },
     callRecords: [
       { type: "AI外呼", time: "2026-05-21 10:42", result: "已接通", duration: "61秒", summary: "客户有近期看车计划，愿意接收车型资料。AI识别为中意向，建议由原跟进人继续确认。" },
       { type: "人工外呼", time: "2026-05-21 11:08", result: "已接通", duration: "126秒", summary: "王同学完成电话确认，客户同意添加微信并接收宝马3系报价资料。" }
@@ -172,6 +190,15 @@ const leads = [
       budget: "25万左右",
       cycle: "本周",
       type: "增购"
+    },
+    labels: {
+      objection: "客户反感：无",
+      bought: "已买车：否",
+      issue: "AI通话问题：打断",
+      assistant: "语音助理：否",
+      wechatWay: "加微方式：RPA加微",
+      lastNode: "最后节点：确认微信",
+      effective: "有效交互：是"
     },
     callRecords: [
       { type: "AI外呼", time: "2026-05-21 10:18", result: "已接通", duration: "73秒", summary: "客户明确同意添加微信，AI完成称呼和手机号确认。建议立即人工外呼并同步RPA加微。" },
@@ -201,6 +228,15 @@ const leads = [
       cycle: "未明确",
       type: "未知"
     },
+    labels: {
+      objection: "客户反感：未知",
+      bought: "已买车：未知",
+      issue: "AI通话问题：无",
+      assistant: "语音助理：否",
+      wechatWay: "加微方式：未触达",
+      lastNode: "最后节点：未接通",
+      effective: "有效交互：否"
+    },
     callRecords: [
       { type: "AI外呼", time: "2026-05-21 11:02", result: "未接通", duration: "-", summary: "AI外呼未接通，暂未生成意向判断。" }
     ],
@@ -226,6 +262,15 @@ const leads = [
       budget: "30万左右",
       cycle: "1-3个月",
       type: "家庭增购"
+    },
+    labels: {
+      objection: "客户反感：无",
+      bought: "已买车：否",
+      issue: "AI通话问题：识别偏差",
+      assistant: "语音助理：否",
+      wechatWay: "加微方式：短信加微",
+      lastNode: "最后节点：加微失败",
+      effective: "有效交互：是"
     },
     callRecords: [
       { type: "AI外呼", time: "2026-05-21 11:20", result: "已接通", duration: "52秒", summary: "客户愿意后续沟通，但本次加微链接未完成添加。AI识别为中意向，建议人工复核加微失败原因。" },
@@ -367,7 +412,10 @@ function renderRules() {
 }
 
 function renderLeads() {
-  document.querySelector("#leadTable").innerHTML = leads.map((lead, index) => `
+  const rows = leads
+    .map((lead, index) => ({ lead, index }))
+    .filter(({ lead }) => leadMatchesTagFilters(lead));
+  document.querySelector("#leadTable").innerHTML = rows.map(({ lead, index }) => `
     <tr>
       <td>${lead.id}</td>
       <td>${lead.customer}</td>
@@ -385,6 +433,15 @@ function renderLeads() {
   document.querySelectorAll(".lead-detail-button").forEach((button) => {
     button.addEventListener("click", () => openLeadDetail(Number(button.dataset.index)));
   });
+}
+
+function leadMatchesTagFilters(lead) {
+  const objection = document.querySelector("#tagObjectionFilter")?.value || "全部反感标签";
+  const bought = document.querySelector("#tagBoughtFilter")?.value || "全部购车状态";
+  const issue = document.querySelector("#tagIssueFilter")?.value || "全部通话问题";
+  return (objection.startsWith("全部") || lead.labels.objection === objection)
+    && (bought.startsWith("全部") || lead.labels.bought === bought)
+    && (issue.startsWith("全部") || lead.labels.issue === issue);
 }
 
 function renderPeople() {
@@ -500,6 +557,34 @@ function bindLeadModal() {
   });
 }
 
+function bindLeadFilters() {
+  ["#tagObjectionFilter", "#tagBoughtFilter", "#tagIssueFilter"].forEach((selector) => {
+    document.querySelector(selector).addEventListener("change", renderLeads);
+  });
+}
+
+function bindFeedbackModal() {
+  const modal = document.querySelector("#feedbackModal");
+  const close = () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  };
+  document.querySelectorAll(".close-feedback-modal").forEach((button) => button.addEventListener("click", close));
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+  document.querySelector("#saveFeedback").addEventListener("click", () => {
+    close();
+    toast("跟进反馈已保存并按配置回流CRM");
+  });
+}
+
+function openFeedbackModal() {
+  const modal = document.querySelector("#feedbackModal");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
 function openLeadDetail(index) {
   const lead = leads[index];
   document.querySelector("#leadModalTitle").textContent = `${lead.id} 线索详情`;
@@ -524,6 +609,12 @@ function openLeadDetail(index) {
             <span><b>购车预算</b>${lead.intentInfo.budget}</span>
             <span><b>购车周期</b>${lead.intentInfo.cycle}</span>
             <span><b>购车类型</b>${lead.intentInfo.type}</span>
+          </div>
+        </section>
+        <section class="detail-section">
+          <h2>客户标签</h2>
+          <div class="label-cloud">
+            ${Object.values(lead.labels).map((label) => `<span class="tag">${label}</span>`).join("")}
           </div>
         </section>
         <section class="detail-section">
@@ -553,7 +644,7 @@ function openLeadDetail(index) {
           <button class="secondary-button">发起外呼</button>
           <button class="secondary-button">短信加微</button>
           <button class="secondary-button">RPA加微</button>
-          <button class="secondary-button">跟进反馈</button>
+          <button class="primary-button" id="openFeedback">跟进反馈</button>
         </div>
       </aside>
     </div>
@@ -561,6 +652,7 @@ function openLeadDetail(index) {
   const modal = document.querySelector("#leadModal");
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
+  document.querySelector("#openFeedback").addEventListener("click", openFeedbackModal);
 }
 
 function bindActions() {
@@ -615,5 +707,7 @@ bindNavigation();
 bindRuleTabs();
 bindModal();
 bindLeadModal();
+bindLeadFilters();
+bindFeedbackModal();
 bindPersonModal();
 bindActions();

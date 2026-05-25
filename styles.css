@@ -31,7 +31,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -223,13 +224,19 @@ small {
 }
 
 select,
-input {
+input,
+textarea {
   min-height: 38px;
   padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
   color: var(--text);
+}
+
+textarea {
+  padding: 10px 12px;
+  resize: vertical;
 }
 
 .primary-button,
@@ -281,9 +288,24 @@ input {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(130px, 1fr));
+  grid-template-columns: repeat(9, minmax(120px, 1fr));
   gap: 12px;
   margin-bottom: 14px;
+}
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.filter-bar label {
+  min-width: 180px;
 }
 
 .metric-card,
@@ -651,20 +673,32 @@ tr:last-child td {
   display: flex;
 }
 
+.modal.drawer {
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.modal.drawer.open {
+  display: flex;
+}
+
 .modal-panel {
   width: min(760px, 100%);
   padding: 20px;
 }
 
-.lead-modal-panel {
-  width: min(1180px, calc(100vw - 48px));
-  max-height: calc(100vh - 48px);
+.lead-drawer-panel {
+  width: min(860px, 100vw);
+  height: 100vh;
+  max-height: 100vh;
   overflow: auto;
+  border-radius: 18px 0 0 18px;
+  animation: slideIn 0.18s ease-out;
 }
 
 .lead-detail-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 
@@ -720,14 +754,18 @@ tr:last-child td {
   margin: 8px 0 0;
 }
 
+.label-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .op-record {
   background: var(--surface-soft) !important;
 }
 
 .handoff-panel {
-  position: sticky;
-  top: 0;
-  align-self: start;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -746,7 +784,20 @@ tr:last-child td {
 
 .handoff-actions {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(24px);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .form-grid {
@@ -815,7 +866,7 @@ label {
 
 @media (max-width: 1180px) {
   .metric-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .dashboard-grid,
@@ -867,7 +918,8 @@ label {
   .form-grid,
   .info-grid,
   .intent-grid,
-  .detail-actions {
+  .detail-actions,
+  .handoff-actions {
     grid-template-columns: 1fr;
   }
 

@@ -40,9 +40,36 @@
         </header>
 
         <section class="view active" id="dashboard">
+          <div class="filter-bar">
+            <label>外呼方式
+              <select id="callMethodFilter">
+                <option>全部</option>
+                <option>AI外呼</option>
+                <option>人工外呼</option>
+              </select>
+            </label>
+            <label>日期
+              <select id="dateRangeFilter">
+                <option>最近七天内</option>
+                <option>今天</option>
+                <option>昨天</option>
+                <option>最近三十天</option>
+              </select>
+            </label>
+            <label>跟进人
+              <select id="ownerFilter">
+                <option>全部跟进人</option>
+                <option>王同学</option>
+                <option>李同学</option>
+                <option>待分配</option>
+              </select>
+            </label>
+          </div>
           <div class="metric-grid">
-            <article class="metric-card"><span>今日AI外呼</span><strong data-count="4820">4,820</strong><small>已完成 4,316</small></article>
-            <article class="metric-card"><span>AI接通率</span><strong>43.2%</strong><small>接通 1,864</small></article>
+            <article class="metric-card"><span>今日外呼</span><strong data-count="4820">4,820</strong><small>已完成 4,316</small></article>
+            <article class="metric-card"><span>外呼完成</span><strong data-count="4316">4,316</strong><small>完成率 89.5%</small></article>
+            <article class="metric-card"><span>接通率</span><strong>43.2%</strong><small>接通 1,864</small></article>
+            <article class="metric-card"><span>通话时长</span><strong>486h</strong><small>平均 64秒</small></article>
             <article class="metric-card"><span>有效交互率</span><strong>58.6%</strong><small>有效交互 1,092</small></article>
             <article class="metric-card"><span>高意向率</span><strong>18.4%</strong><small>高意向 342</small></article>
             <article class="metric-card"><span>同意加微率</span><strong>9.8%</strong><small>同意加微 183</small></article>
@@ -114,6 +141,9 @@
               <select><option>全部联系状态</option><option>AI待外呼</option><option>已接通</option><option>未接通</option></select>
               <select><option>全部加微状态</option><option>未加微</option><option>同意加微</option><option>加微成功</option><option>加微失败</option></select>
               <select><option>全部转人工优先级</option><option>AI外呼中-无需接管</option><option>P0高优待跟进</option><option>P1择机跟进</option><option>已跟进</option></select>
+              <select id="tagObjectionFilter"><option>全部反感标签</option><option>客户反感：无</option><option>客户反感：轻微</option><option>客户反感：强烈</option></select>
+              <select id="tagBoughtFilter"><option>全部购车状态</option><option>已买车：否</option><option>已买车：是</option><option>已买车：未知</option></select>
+              <select id="tagIssueFilter"><option>全部通话问题</option><option>AI通话问题：无</option><option>AI通话问题：打断</option><option>AI通话问题：识别偏差</option></select>
               <select><option>全部跟进人</option><option>王同学</option><option>李同学</option><option>待分配</option></select>
             </div>
           </div>
@@ -169,15 +199,32 @@
       </div>
     </div>
 
-    <div class="modal" id="leadModal" aria-hidden="true">
-      <div class="modal-panel lead-modal-panel">
+    <div class="modal drawer" id="leadModal" aria-hidden="true">
+      <div class="modal-panel lead-drawer-panel">
         <div class="modal-head">
           <h2 id="leadModalTitle">线索详情</h2>
           <button class="icon-button close-lead-modal">×</button>
         </div>
         <div id="leadDetailContent"></div>
+      </div>
+    </div>
+
+    <div class="modal" id="feedbackModal" aria-hidden="true">
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2>跟进反馈</h2>
+          <button class="icon-button close-feedback-modal">×</button>
+        </div>
+        <div class="form-grid">
+          <label>客户状态<select><option>待继续跟进</option><option>已加微</option><option>无购车兴趣</option><option>已买车</option><option>拒绝联系</option></select></label>
+          <label>是否同意加微<select><option>同意加微</option><option>不同意加微</option><option>待确认</option></select></label>
+          <label>下次跟进时间<input type="datetime-local" value="2026-05-26T10:00" /></label>
+          <label>是否回流CRM<select><option>是</option><option>否</option></select></label>
+          <label class="wide-field">备注<textarea rows="4" placeholder="填写本次外呼结果、客户诉求、下次跟进计划"></textarea></label>
+        </div>
         <div class="modal-actions">
-          <button class="secondary-button close-lead-modal">关闭</button>
+          <button class="secondary-button close-feedback-modal">取消</button>
+          <button class="primary-button" id="saveFeedback">提交反馈</button>
         </div>
       </div>
     </div>
