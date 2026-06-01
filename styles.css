@@ -311,6 +311,7 @@ textarea {
 .metric-card,
 .panel,
 .rule-card,
+.scene-card,
 .detail,
 .modal-panel {
   border: 1px solid var(--line);
@@ -546,11 +547,19 @@ tr:last-child td {
   gap: 14px;
 }
 
-.rule-card {
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.rule-card,
+.scene-card {
   padding: 16px;
 }
 
 .rule-card header,
+.scene-card header,
 .detail-head {
   display: flex;
   align-items: flex-start;
@@ -558,11 +567,13 @@ tr:last-child td {
   gap: 12px;
 }
 
-.rule-card h2 {
+.rule-card h2,
+.scene-card h2 {
   font-size: 17px;
 }
 
-.rule-card p {
+.rule-card p,
+.scene-card p {
   margin: 6px 0 0;
 }
 
@@ -571,6 +582,48 @@ tr:last-child td {
   gap: 9px;
   margin: 16px 0;
   color: var(--muted);
+}
+
+.scene-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.scene-meta span {
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--muted);
+}
+
+.scene-meta b {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text);
+}
+
+.scene-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.scene-metrics em {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.scene-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .switch {
@@ -638,6 +691,12 @@ tr:last-child td {
   padding-top: 16px;
   margin-top: 16px;
   border-top: 1px solid var(--line);
+}
+
+.detail-section.first-section {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
 }
 
 .detail-section p {
@@ -914,6 +973,8 @@ label {
 
   .metric-grid,
   .rule-grid,
+  .scene-grid,
+  .scene-meta,
   .funnel-row,
   .form-grid,
   .info-grid,

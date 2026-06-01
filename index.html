@@ -14,17 +14,19 @@
           <strong>外呼加微协同平台</strong>
         </div>
         <label class="business-switcher">
-          <span>业务方向</span>
-          <select id="businessSelect" aria-label="业务方向">
+          <span>当前场景</span>
+          <select id="businessSelect" aria-label="当前场景">
             <option>新车加微</option>
             <option>二手车加微</option>
+            <option>沉默线索唤醒</option>
+            <option>战败线索回捞</option>
           </select>
         </label>
         <nav class="nav">
           <button class="nav-item active" data-view="dashboard">总览</button>
           <button class="nav-item" data-view="leads">线索任务池</button>
+          <button class="nav-item" data-view="scenes">场景管理</button>
           <button class="nav-item" data-view="people">人员配置</button>
-          <button class="nav-item" data-view="rules">规则配置</button>
         </nav>
       </aside>
 
@@ -99,41 +101,6 @@
           </div>
         </section>
 
-        <section class="view" id="rules">
-          <div class="section-head">
-            <div>
-              <h2>规则配置</h2>
-            </div>
-            <button class="primary-button" id="openRuleModal">新建AI外呼规则</button>
-          </div>
-          <div class="tabs" role="tablist">
-            <button class="tab active" data-rule-tab="callRules">AI外呼规则</button>
-            <button class="tab" data-rule-tab="handoffRules">转人工规则</button>
-            <button class="tab" data-rule-tab="callbackRules">回流CRM规则</button>
-          </div>
-          <div class="rule-pane active" id="callRules">
-            <div class="rule-pane-head">
-              <h3>AI外呼规则</h3>
-              <span>配置哪些CRM线索进入AI外呼，以及使用哪套AI话术。</span>
-            </div>
-            <div class="rule-grid" id="callRuleGrid"></div>
-          </div>
-          <div class="rule-pane" id="handoffRules">
-            <div class="rule-pane-head">
-              <h3>转人工规则</h3>
-              <span>配置AI外呼结果如何生成承接任务、任务等级和推荐动作。</span>
-            </div>
-            <div class="rule-grid" id="handoffRuleGrid"></div>
-          </div>
-          <div class="rule-pane" id="callbackRules">
-            <div class="rule-pane-head">
-              <h3>回流CRM规则</h3>
-              <span>配置哪些过程状态、人工结果和异常原因需要同步回CRM。</span>
-            </div>
-            <div class="rule-grid" id="callbackRuleGrid"></div>
-          </div>
-        </section>
-
         <section class="view" id="leads">
           <div class="section-head">
             <h2>线索任务池</h2>
@@ -159,6 +126,17 @@
           </section>
         </section>
 
+        <section class="view" id="scenes">
+          <div class="section-head">
+            <div>
+              <h2>场景管理</h2>
+              <p>按业务场景独立管理线索数据、加微能力、承接人员和看板口径。</p>
+            </div>
+            <button class="primary-button" id="openSceneModal">新建场景</button>
+          </div>
+          <div class="scene-grid" id="sceneGrid"></div>
+        </section>
+
         <section class="view" id="people">
           <div class="section-head">
             <h2>人员配置</h2>
@@ -182,19 +160,40 @@
       </main>
     </div>
 
-    <div class="modal" id="ruleModal" aria-hidden="true">
+    <div class="modal drawer" id="sceneDrawer" aria-hidden="true">
+      <div class="modal-panel lead-drawer-panel">
+        <div class="modal-head">
+          <h2 id="sceneDrawerTitle">场景详情</h2>
+          <button class="icon-button close-scene-drawer">×</button>
+        </div>
+        <div id="sceneDrawerContent"></div>
+      </div>
+    </div>
+
+    <div class="modal" id="sceneModal" aria-hidden="true">
       <div class="modal-panel">
         <div class="modal-head">
-          <h2 id="ruleModalTitle">新建AI外呼规则</h2>
-          <button class="icon-button close-modal">×</button>
+          <h2 id="sceneModalTitle">新建场景</h2>
+          <button class="icon-button close-scene-modal">×</button>
         </div>
-        <div class="form-grid" id="ruleForm"></div>
-        <div class="rule-builder" id="ruleBuilder">
-          <b>规则条件</b>
+        <div class="form-grid">
+          <label>场景名称<input id="sceneNameInput" value="新车加微" /></label>
+          <label>业务方向<select><option>新车</option><option>二手车</option><option>存量回捞</option><option>电商</option></select></label>
+          <label>场景状态<select><option>启用</option><option>停用</option></select></label>
+          <label>场景负责人<select><option>陈主管</option><option>王同学</option><option>李同学</option></select></label>
+          <label>线索池<input value="CRM新车未加微线索池" /></label>
+          <label>客户ID字段<input value="customer_id" /></label>
+          <label>手机号字段<input value="phone" /></label>
+          <label>跟进人电话字段<input value="owner_phone" /></label>
+          <label>短信加微接口<select><option>已配置</option><option>未配置</option></select></label>
+          <label>RPA加微能力<select><option>已配置</option><option>未配置</option></select></label>
+          <label>承接团队<input value="BPO一组 / 直营顾问组" /></label>
+          <label>分配方式<select><option>按原跟进人</option><option>按团队轮转</option><option>主管手动分配</option></select></label>
+          <label class="wide-field">场景说明<textarea rows="3" placeholder="描述该场景的业务目标、线索来源和承接方式"></textarea></label>
         </div>
         <div class="modal-actions">
-          <button class="secondary-button close-modal">取消</button>
-          <button class="primary-button" id="saveRule">保存规则</button>
+          <button class="secondary-button close-scene-modal">取消</button>
+          <button class="primary-button" id="saveScene">保存场景</button>
         </div>
       </div>
     </div>
@@ -248,24 +247,6 @@
         </div>
       </div>
     </div>
-
-    <template id="legacyRuleTemplate">
-      <div>
-        <div class="form-grid">
-          <label>规则名称<input value="BPO未加微未联系自动外呼" /></label>
-          <label>适用同学/团队<select><option>BPO一组</option><option>直营顾问组</option><option>BPO二组</option></select></label>
-          <label>CRM线索条件<select><option>已分配 + 未加微 + 未联系</option><option>高价值客户 + 未加微</option><option>沉默30天 + 未加微</option></select></label>
-          <label>AI话术<select><option>加微引导标准版</option><option>高价值客户精简版</option><option>沉默客户唤醒版</option></select></label>
-          <label class="wide-field">转人工规则<select><option>高意向或同意加微，P0转人工</option><option>中高意向且未加微，P1转人工</option><option>高价值客户接通后人工复核</option></select></label>
-        </div>
-        <div class="rule-builder">
-          <b>复杂条件</b>
-          <div class="condition-row"><span>通话标签</span><em>包含 高意向 / 愿意加微 / 需要资料</em></div>
-          <div class="condition-row"><span>加微状态</span><em>未加微 或 加微失败</em></div>
-          <div class="condition-row"><span>历史沟通</span><em>近7天无人工跟进</em></div>
-        </div>
-      </div>
-    </template>
 
     <script src="app.js"></script>
   </body>

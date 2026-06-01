@@ -2,7 +2,7 @@ const titles = {
   dashboard: "总览",
   leads: "线索任务池",
   people: "人员配置",
-  rules: "规则配置"
+  scenes: "场景管理"
 };
 
 const funnel = [
@@ -16,84 +16,106 @@ const funnel = [
   ["加微成功", 528, "30.3%"]
 ];
 
-const callRules = [
+const scenes = [
   {
-    name: "BPO一组未加微未联系",
-    owner: "BPO一组 24人",
-    condition: "CRM已分配 + 未加微 + 未联系",
-    trigger: "自动触发",
-    schedule: "-",
-    script: "加微引导标准版",
-    handoff: "高意向或同意加微，P0转人工",
-    enabled: true
+    name: "新车加微",
+    direction: "新车",
+    status: "启用",
+    owner: "陈主管",
+    desc: "承接新车业务未加微线索，完成AI前置触达和人工加微承接。",
+    leadPool: "CRM新车未加微线索池",
+    source: "CRM自动同步",
+    idField: "customer_id",
+    phoneField: "phone",
+    ownerPhoneField: "owner_phone",
+    dataStatus: "正常",
+    syncTime: "2026-06-01 09:30",
+    sms: "已配置",
+    rpa: "已配置",
+    wecom: "懂车帝新车企微",
+    template: "新车报价资料加微模板",
+    team: "BPO一组 / 直营顾问组",
+    assign: "按原跟进人",
+    p0Sla: "15分钟",
+    p1Sla: "2小时",
+    peopleCount: 36,
+    metrics: ["今日外呼 4,820", "加微成功 528", "人工接管 1,742"],
+    warnings: ["线索字段完整", "加微接口正常"]
   },
   {
-    name: "直营高价值未加微",
-    owner: "直营顾问组 12人",
-    condition: "高价值客户 + 未加微 + 无风险标签",
-    trigger: "自动触发",
-    schedule: "-",
-    script: "高价值客户精简版",
-    handoff: "接通且中高意向，P0转人工",
-    enabled: true
+    name: "二手车加微",
+    direction: "二手车",
+    status: "启用",
+    owner: "王同学",
+    desc: "面向二手车询价、置换、到店咨询线索，区分车源城市与预算承接。",
+    leadPool: "CRM二手车询价线索池",
+    source: "CRM自动同步",
+    idField: "biz_id",
+    phoneField: "encrypt_phone",
+    ownerPhoneField: "sales_phone",
+    dataStatus: "正常",
+    syncTime: "2026-06-01 09:18",
+    sms: "已配置",
+    rpa: "未配置",
+    wecom: "二手车顾问企微",
+    template: "二手车车源推荐模板",
+    team: "二手车顾问组",
+    assign: "按团队轮转",
+    p0Sla: "20分钟",
+    p1Sla: "4小时",
+    peopleCount: 18,
+    metrics: ["今日外呼 1,286", "加微成功 164", "人工接管 492"],
+    warnings: ["RPA加微待接入"]
   },
   {
-    name: "沉默客户唤醒",
-    owner: "BPO二组 18人",
-    condition: "沉默30天 + 未加微",
-    trigger: "定时触发",
-    schedule: "每天10:00触发",
-    script: "沉默客户唤醒版",
-    handoff: "同意加微或需要资料，P1转人工",
-    enabled: false
-  }
-];
-
-const handoffRules = [
-  {
-    name: "高意向未加微转人工",
-    owner: "全部团队",
-    condition: "通话标签包含高意向，且加微状态为未加微",
-    result: "P0任务 / 15分钟SLA / 推荐人工外呼",
-    enabled: true
+    name: "沉默线索唤醒",
+    direction: "存量回捞",
+    status: "启用",
+    owner: "李同学",
+    desc: "回捞历史沉默、长期未联系和公海沉淀线索，优先筛出仍有购车兴趣客户。",
+    leadPool: "CRM沉默30天未加微线索池",
+    source: "CRM批量同步",
+    idField: "lead_id",
+    phoneField: "phone",
+    ownerPhoneField: "last_owner_phone",
+    dataStatus: "字段待校验",
+    syncTime: "2026-06-01 08:50",
+    sms: "已配置",
+    rpa: "已配置",
+    wecom: "存量运营企微",
+    template: "沉默线索唤醒模板",
+    team: "BPO二组",
+    assign: "主管手动分配",
+    p0Sla: "30分钟",
+    p1Sla: "6小时",
+    peopleCount: 22,
+    metrics: ["今日外呼 2,104", "加微成功 96", "人工接管 388"],
+    warnings: ["跟进人电话字段缺失 6条"]
   },
   {
-    name: "同意加微优先承接",
-    owner: "BPO团队",
-    condition: "客户明确同意加微，或AI识别愿意接收资料",
-    result: "P0任务 / 推荐短信加微 + 电话确认",
-    enabled: true
-  },
-  {
-    name: "历史跟进缺口复核",
-    owner: "直营顾问组",
-    condition: "近7天无人工跟进，且AI识别中意向",
-    result: "P1任务 / 分配原跟进人",
-    enabled: true
-  }
-];
-
-const callbackRules = [
-  {
-    name: "AI外呼完成回流",
-    owner: "CRM客户状态",
-    condition: "AI外呼完成后回流联系状态、意向等级和摘要",
-    result: "实时回流",
-    enabled: true
-  },
-  {
-    name: "人工承接结果回流",
-    owner: "CRM跟进记录",
-    condition: "人工反馈加微成功、失败或需二次跟进",
-    result: "实时回流",
-    enabled: true
-  },
-  {
-    name: "失败原因补偿回流",
-    owner: "CRM异常状态",
-    condition: "回流失败或字段校验失败",
-    result: "每30分钟重试",
-    enabled: true
+    name: "战败线索回捞",
+    direction: "存量回捞",
+    status: "停用",
+    owner: "陈主管",
+    desc: "针对历史战败和无效线索做低成本触达，重新识别购车周期和加微信意愿。",
+    leadPool: "CRM历史战败线索池",
+    source: "CRM手动圈选",
+    idField: "customer_id",
+    phoneField: "phone",
+    ownerPhoneField: "owner_phone",
+    dataStatus: "待配置",
+    syncTime: "-",
+    sms: "未配置",
+    rpa: "未配置",
+    wecom: "待绑定",
+    template: "待配置",
+    team: "待绑定",
+    assign: "主管手动分配",
+    p0Sla: "30分钟",
+    p1Sla: "1天",
+    peopleCount: 0,
+    metrics: ["今日外呼 0", "加微成功 0", "人工接管 0"],
+    warnings: ["线索池未启用", "加微接口未配置"]
   }
 ];
 
@@ -289,59 +311,6 @@ const people = [
   ["13500003333", "陈主管", "主管", "BPO一组", "男", "0", "0", "启用"]
 ];
 
-const ruleForms = {
-  callRules: {
-    title: "新建AI外呼规则",
-    button: "新建AI外呼规则",
-    fields: [
-      ["规则名称", "input", "BPO未加微未联系自动外呼"],
-      ["适用同学/团队", "select", ["BPO一组", "直营顾问组", "BPO二组"]],
-      ["CRM线索条件", "select", ["已分配 + 未加微 + 未联系", "高价值客户 + 未加微", "沉默30天 + 未加微"]],
-      ["触发方式", "select", ["自动触发", "定时触发"]],
-      ["定时触发规则", "select", ["每天09:30触发", "每天10:00触发", "每2小时触发", "每周一09:00触发"]],
-      ["AI话术", "select", ["加微引导标准版", "高价值客户精简版", "沉默客户唤醒版"]]
-    ],
-    conditions: [
-      ["线索状态", "已分配 / 未加微 / 未联系"],
-      ["适用范围", "指定团队或同学名下线索"],
-      ["触发方式", "自动触发或按定时规则触发"],
-      ["执行动作", "进入AI外呼任务队列"]
-    ]
-  },
-  handoffRules: {
-    title: "新建转人工规则",
-    button: "新建转人工规则",
-    fields: [
-      ["规则名称", "input", "高意向未加微转人工"],
-      ["通话标签", "select", ["高意向 / 愿意加微", "中意向 / 需要资料", "反感 / 风险"]],
-      ["加微状态", "select", ["未加微", "同意加微", "加微失败"]],
-      ["承接团队", "select", ["原跟进人", "BPO主管分配", "直营顾问组"]]
-    ],
-    conditions: [
-      ["历史沟通", "近7天无人工跟进"],
-      ["任务等级", "P0高优 / P1普通"],
-      ["推荐动作", "人工外呼 / 短信加微 / RPA加微"]
-    ]
-  },
-  callbackRules: {
-    title: "新建回流CRM规则",
-    button: "新建回流CRM规则",
-    fields: [
-      ["规则名称", "input", "AI外呼完成状态回流"],
-      ["回流节点", "select", ["AI外呼完成", "转人工生成", "人工反馈完成", "回流失败补偿"]],
-      ["回流字段", "select", ["外呼状态 + 意向等级 + 摘要", "转人工状态 + 任务等级", "加微结果 + 失败原因"]],
-      ["回流方式", "select", ["实时回流", "批量补偿", "失败重试"]]
-    ],
-    conditions: [
-      ["幂等键", "客户ID + 状态类型 + 任务ID"],
-      ["失败处理", "记录错误原因并进入补偿队列"],
-      ["CRM状态", "按字段映射更新客户跟进记录"]
-    ]
-  }
-};
-
-let activeRuleTab = "callRules";
-
 function tagClass(value) {
   if (value.includes("运行") || value.includes("高意向") || value.includes("成功") || value.includes("已接通") || value.includes("已跟进") || value.includes("无需接管")) return "green";
   if (value.includes("待") || value.includes("择机") || value.includes("中意向") || value.includes("同意")) return "orange";
@@ -369,48 +338,6 @@ function renderTodos() {
   document.querySelector("#p1TodoCount").textContent = p1Count;
 }
 
-function ruleCard(rule, mode = "call") {
-  const resultLabel = mode === "call" ? `转人工：${rule.handoff}` : `执行结果：${rule.result}`;
-  const typeLabel = mode === "call" ? "AI外呼" : mode === "handoff" ? "转人工" : "回流CRM";
-  const ruleList = mode === "call" ? callRules : mode === "handoff" ? handoffRules : callbackRules;
-  const tabName = mode === "call" ? "callRules" : mode === "handoff" ? "handoffRules" : "callbackRules";
-  const ruleIndex = ruleList.indexOf(rule);
-  return `
-    <article class="rule-card">
-      <header>
-        <div>
-          <h2>${rule.name}</h2>
-          <p>${rule.owner}</p>
-        </div>
-        <button class="switch ${rule.enabled ? "on" : ""}" title="${rule.enabled ? "已启用" : "已停用"}"></button>
-      </header>
-      <span class="tag">${typeLabel}</span>
-      <div class="rule-meta">
-        <span>条件：${rule.condition}</span>
-        ${rule.trigger ? `<span>触发方式：${rule.trigger}${rule.schedule && rule.schedule !== "-" ? ` / ${rule.schedule}` : ""}</span>` : ""}
-        ${rule.script ? `<span>AI话术：${rule.script}</span>` : ""}
-        <span>${resultLabel}</span>
-      </div>
-      <button class="secondary-button edit-rule-button" data-tab="${tabName}" data-index="${ruleIndex}">编辑规则</button>
-    </article>
-  `;
-}
-
-function renderRules() {
-  document.querySelector("#callRuleGrid").innerHTML = callRules.map((rule) => ruleCard(rule, "call")).join("");
-  document.querySelector("#handoffRuleGrid").innerHTML = handoffRules.map((rule) => ruleCard(rule, "handoff")).join("");
-  document.querySelector("#callbackRuleGrid").innerHTML = callbackRules.map((rule) => ruleCard(rule, "callback")).join("");
-  document.querySelectorAll(".switch").forEach((button) => {
-    button.addEventListener("click", () => {
-      button.classList.toggle("on");
-      toast(button.classList.contains("on") ? "规则已启用" : "规则已停用");
-    });
-  });
-  document.querySelectorAll(".edit-rule-button").forEach((button) => {
-    button.addEventListener("click", () => openRuleModal(button.dataset.tab, Number(button.dataset.index)));
-  });
-}
-
 function renderLeads() {
   const rows = leads
     .map((lead, index) => ({ lead, index }))
@@ -432,6 +359,39 @@ function renderLeads() {
   `).join("");
   document.querySelectorAll(".lead-detail-button").forEach((button) => {
     button.addEventListener("click", () => openLeadDetail(Number(button.dataset.index)));
+  });
+}
+
+function renderScenes() {
+  document.querySelector("#sceneGrid").innerHTML = scenes.map((scene, index) => `
+    <article class="scene-card">
+      <header>
+        <div>
+          <h2>${scene.name}</h2>
+          <p>${scene.desc}</p>
+        </div>
+        <span class="tag ${scene.status === "启用" ? "green" : ""}">${scene.status}</span>
+      </header>
+      <div class="scene-meta">
+        <span><b>业务方向</b>${scene.direction}</span>
+        <span><b>线索池</b>${scene.leadPool}</span>
+        <span><b>加微能力</b>短信 ${scene.sms} / RPA ${scene.rpa}</span>
+        <span><b>承接团队</b>${scene.team}</span>
+      </div>
+      <div class="scene-metrics">
+        ${scene.metrics.map((metric) => `<em>${metric}</em>`).join("")}
+      </div>
+      <div class="scene-actions">
+        <button class="text-button scene-detail-button" data-index="${index}">详情</button>
+        <button class="secondary-button scene-edit-button" data-index="${index}">编辑</button>
+      </div>
+    </article>
+  `).join("");
+  document.querySelectorAll(".scene-detail-button").forEach((button) => {
+    button.addEventListener("click", () => openSceneDrawer(Number(button.dataset.index)));
+  });
+  document.querySelectorAll(".scene-edit-button").forEach((button) => {
+    button.addEventListener("click", () => openSceneModal(Number(button.dataset.index)));
   });
 }
 
@@ -474,77 +434,6 @@ function bindNavigation() {
   });
 }
 
-function bindRuleTabs() {
-  document.querySelectorAll(".tab").forEach((button) => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
-      document.querySelectorAll(".rule-pane").forEach((pane) => pane.classList.remove("active"));
-      button.classList.add("active");
-      document.querySelector(`#${button.dataset.ruleTab}`).classList.add("active");
-      activeRuleTab = button.dataset.ruleTab;
-      document.querySelector("#openRuleModal").textContent = ruleForms[activeRuleTab].button;
-    });
-  });
-}
-
-function bindModal() {
-  const modal = document.querySelector("#ruleModal");
-  const close = () => {
-    modal.classList.remove("open");
-    modal.setAttribute("aria-hidden", "true");
-  };
-  document.querySelector("#openRuleModal").addEventListener("click", () => {
-    openRuleModal(activeRuleTab);
-  });
-  document.querySelectorAll(".close-modal").forEach((button) => button.addEventListener("click", close));
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) close();
-  });
-  document.querySelector("#saveRule").addEventListener("click", () => {
-    close();
-    toast("规则已保存");
-  });
-}
-
-function openRuleModal(tabName, ruleIndex = null) {
-  const modal = document.querySelector("#ruleModal");
-  renderRuleForm(tabName, ruleIndex);
-  modal.classList.add("open");
-  modal.setAttribute("aria-hidden", "false");
-}
-
-function renderRuleForm(tabName, ruleIndex = null) {
-  const config = ruleForms[tabName];
-  const source = tabName === "callRules" ? callRules : tabName === "handoffRules" ? handoffRules : callbackRules;
-  const rule = Number.isInteger(ruleIndex) ? source[ruleIndex] : null;
-  document.querySelector("#ruleModalTitle").textContent = rule ? config.title.replace("新建", "编辑") : config.title;
-  document.querySelector("#ruleForm").innerHTML = config.fields.map(([label, type, value]) => {
-    const preset = rule ? ruleFormValue(tabName, label, rule) : "";
-    if (type === "select") {
-      return `<label>${label}<select>${value.map((option) => `<option${option === preset ? " selected" : ""}>${option}</option>`).join("")}</select></label>`;
-    }
-    return `<label>${label}<input value="${preset || value}" /></label>`;
-  }).join("");
-  document.querySelector("#ruleBuilder").innerHTML = `
-    <b>规则条件</b>
-    ${config.conditions.map(([name, value]) => `<div class="condition-row"><span>${name}</span><em>${value}</em></div>`).join("")}
-  `;
-}
-
-function ruleFormValue(tabName, label, rule) {
-  if (label === "规则名称") return rule.name;
-  if (label === "适用同学/团队") return rule.owner.replace(/\s+\d+人$/, "");
-  if (label === "CRM线索条件" || label === "通话标签" || label === "回流节点") return rule.condition;
-  if (label === "触发方式") return rule.trigger;
-  if (label === "定时触发规则") return rule.schedule && rule.schedule !== "-" ? rule.schedule : "每天09:30触发";
-  if (label === "AI话术") return rule.script;
-  if (label === "加微状态") return "未加微";
-  if (label === "承接团队") return rule.owner;
-  if (label === "回流字段") return rule.result || "";
-  if (label === "回流方式") return rule.result || "";
-  return "";
-}
-
 function bindLeadModal() {
   const modal = document.querySelector("#leadModal");
   const close = () => {
@@ -555,6 +444,105 @@ function bindLeadModal() {
   modal.addEventListener("click", (event) => {
     if (event.target === modal) close();
   });
+}
+
+function bindSceneManagement() {
+  bindSceneDrawer();
+  bindSceneModal();
+}
+
+function bindSceneDrawer() {
+  const modal = document.querySelector("#sceneDrawer");
+  const close = () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  };
+  document.querySelectorAll(".close-scene-drawer").forEach((button) => button.addEventListener("click", close));
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+}
+
+function bindSceneModal() {
+  const modal = document.querySelector("#sceneModal");
+  const close = () => {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  };
+  document.querySelector("#openSceneModal").addEventListener("click", () => openSceneModal());
+  document.querySelectorAll(".close-scene-modal").forEach((button) => button.addEventListener("click", close));
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+  document.querySelector("#saveScene").addEventListener("click", () => {
+    close();
+    toast("场景配置已保存");
+  });
+}
+
+function openSceneModal(index = null) {
+  const scene = Number.isInteger(index) ? scenes[index] : null;
+  document.querySelector("#sceneModalTitle").textContent = scene ? "编辑场景" : "新建场景";
+  document.querySelector("#sceneNameInput").value = scene ? scene.name : "新业务场景";
+  const modal = document.querySelector("#sceneModal");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function openSceneDrawer(index) {
+  const scene = scenes[index];
+  document.querySelector("#sceneDrawerTitle").textContent = `${scene.name} 场景详情`;
+  document.querySelector("#sceneDrawerContent").innerHTML = `
+    <section class="detail-section first-section">
+      <div class="info-grid">
+        <span><b>场景状态</b>${scene.status}</span>
+        <span><b>业务方向</b>${scene.direction}</span>
+        <span><b>负责人</b>${scene.owner}</span>
+        <span><b>最近同步</b>${scene.syncTime}</span>
+      </div>
+      <p>${scene.desc}</p>
+    </section>
+    <section class="detail-section">
+      <h2>线索数据配置</h2>
+      <div class="info-grid">
+        <span><b>线索来源</b>${scene.source}</span>
+        <span><b>线索池</b>${scene.leadPool}</span>
+        <span><b>客户ID字段</b>${scene.idField}</span>
+        <span><b>手机号字段</b>${scene.phoneField}</span>
+        <span><b>跟进人电话字段</b>${scene.ownerPhoneField}</span>
+        <span><b>数据状态</b>${scene.dataStatus}</span>
+      </div>
+    </section>
+    <section class="detail-section">
+      <h2>加微能力配置</h2>
+      <div class="info-grid">
+        <span><b>短信加微接口</b>${scene.sms}</span>
+        <span><b>RPA加微能力</b>${scene.rpa}</span>
+        <span><b>企微主体</b>${scene.wecom}</span>
+        <span><b>加微模板</b>${scene.template}</span>
+      </div>
+    </section>
+    <section class="detail-section">
+      <h2>人员承接配置</h2>
+      <div class="info-grid">
+        <span><b>承接团队</b>${scene.team}</span>
+        <span><b>分配方式</b>${scene.assign}</span>
+        <span><b>P0 SLA</b>${scene.p0Sla}</span>
+        <span><b>P1 SLA</b>${scene.p1Sla}</span>
+        <span><b>可承接人员</b>${scene.peopleCount}人</span>
+      </div>
+    </section>
+    <section class="detail-section">
+      <h2>看板口径与状态</h2>
+      <div class="label-cloud">
+        ${scene.metrics.map((metric) => `<span class="tag">${metric}</span>`).join("")}
+        ${scene.warnings.map((warning) => `<span class="tag ${warning.includes("正常") || warning.includes("完整") ? "green" : "orange"}">${warning}</span>`).join("")}
+      </div>
+    </section>
+  `;
+  const modal = document.querySelector("#sceneDrawer");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
 }
 
 function bindLeadFilters() {
@@ -658,7 +646,7 @@ function openLeadDetail(index) {
 function bindActions() {
   document.querySelector("#businessSelect").addEventListener("change", (event) => {
     document.querySelector(".eyebrow").textContent = event.target.value;
-    toast(`已切换到${event.target.value}`);
+    toast(`已切换到${event.target.value}场景`);
   });
   document.querySelector("#refreshBtn").addEventListener("click", () => {
     document.querySelectorAll("[data-count]").forEach((node) => {
@@ -700,14 +688,13 @@ function toast(message) {
 
 renderFunnel();
 renderTodos();
-renderRules();
 renderLeads();
+renderScenes();
 renderPeople();
 bindNavigation();
-bindRuleTabs();
-bindModal();
 bindLeadModal();
 bindLeadFilters();
 bindFeedbackModal();
+bindSceneManagement();
 bindPersonModal();
 bindActions();
